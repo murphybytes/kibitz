@@ -1,12 +1,14 @@
 #include "kibitz.hpp"
 
 
-using namespace kibitz;
+
 
 int main( int argc, char* argv[] ) {
   std::cout << "starting" << std::endl;
-
-  context& ctxt = get_context();
+  variables_map application_configuration ;
+  kibitz::initialize( application_configuration );
+  
+  return 0;
 
 
 }
