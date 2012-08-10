@@ -10,10 +10,17 @@ Dependencies
 ZeroMQ 
 ```
 git clone ssh://git@github.com/zeromq/zeromq-x.git
-.autogen.sh
+cd zeromq-x
+./autogen.sh
 ./configure --with-pgm
 make 
 sudo make install
 ```
+
+YAML-CPP
+
+http://code.google.com/p/yaml-cpp/
+
+
 
 
