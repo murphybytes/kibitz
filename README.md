@@ -17,10 +17,12 @@ make
 sudo make install
 ```
 
-YAML-CPP
+yaml-cpp 0.3.0
 
 http://code.google.com/p/yaml-cpp/
 
+glog 0.3.2
 
+http://code.google.com/p/google-glog/
 
 
