@@ -4,13 +4,17 @@
 
 
 namespace kibitz {
+  static context* context_ptr = NULL;
 
-  void initialize(const variables_map& application_configuration) {
+  void initialize( int argc, char* argv[] ) {
+    assert( NULL == context_ptr );
+    //context_ptr = new context( application_configuration );
   }
 
   
 
   void terminate() {
+    delete context_ptr;
   }
 
 

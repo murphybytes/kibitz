@@ -9,7 +9,7 @@ namespace kibitz {
 
   typedef void ( *callback )( const string&  );
 
-  void initialize(const variables_map& application_configuration ) ;
+  void initialize( int argc, char* argv[] ) ; 
   void terminate();
 
 }
