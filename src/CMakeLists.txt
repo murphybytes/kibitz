@@ -11,6 +11,10 @@ add_library( kibitz SHARED
 
 target_link_libraries( kibitz
   boost_program_options
+  boost_filesystem
+  boost_system
+  glog
+  zmq
 )
 
 add_executable( test-worker-a  test_worker_a.cpp )

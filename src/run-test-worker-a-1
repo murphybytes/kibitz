@@ -1,0 +1,4 @@
+#!/bin/bash
+
+
+GLOG_logtostderr=1 ./test-worker-a --worker-id=1 --worker-type=test_worker_a

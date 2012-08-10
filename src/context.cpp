@@ -4,8 +4,12 @@
 namespace kibitz {
 
 
-  context::context( const variables_map& application_configuration ) {
-    std::cout << "ctor" << std::endl;
+  context::context( const po::variables_map& application_configuration )
+    :application_configuration_(application_configuration),
+     zmq_context_(NULL)  {
+    DLOG(INFO) << "ctor for context entered" ;
+    zmq_context_ = zmq_init( application_configuration["context-threads"].as<int>() );
+    DLOG(INFO) << "zmq initialized";
   }
 
   void context::set_worker_type( const string& worker_type_name ) {
@@ -18,6 +22,13 @@ namespace kibitz {
 
   void context::register_heartbeat_handler( callback heartbeat_handler ) {
     heartbeat_handler_ = heartbeat_handler;
+  }
+
+  void context::terminate() {
+    DLOG(INFO) << "context.terminate shutting down application" ;
+    if( zmq_context_ ) {
+      zmq_term( zmq_context_ );
+    }
   }
 
 

@@ -5,9 +5,17 @@
 
 int main( int argc, char* argv[] ) {
   std::cout << "starting" << std::endl;
-  kibitz::initialize( argc, argv );
+  int result = 0;
+
+  try {
+    kibitz::initialize( argc, argv );
+    kibitz::terminate();
+  } catch( std::exception& e ) {
+    result = 1;
+    std::cout << "Program failed. " << e.what() << std::endl;
+  }
   
-  return 0;
+  return result;
 
 
 }
