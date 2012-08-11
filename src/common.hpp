@@ -25,6 +25,8 @@ using std::runtime_error;
 
 using boost::format;
 using boost::shared_ptr;
+using boost::thread_group;
+
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem3;

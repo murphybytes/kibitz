@@ -1,5 +1,5 @@
 #include "context.hpp"
-
+#include "heartbeat_sender.hpp"
 
 namespace kibitz {
 
@@ -29,8 +29,9 @@ namespace kibitz {
   }
 
   void context::start() {
-    while( !signalled_ ) {
-    }
+    heartbeat_sender hb_sender( context_ptr(this) );
+    threads_.create_thread(hb_sender);
+    threads_.join_all();
 
   }
 
@@ -44,6 +45,9 @@ namespace kibitz {
     }
   }
 
+  void* context::zmq_context() {
+    return zmq_context_; 
+  }
 
 
 }

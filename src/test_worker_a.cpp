@@ -9,6 +9,7 @@ int main( int argc, char* argv[] ) {
 
   try {
     kibitz::initialize( argc, argv );
+    kibitz::start();
     kibitz::terminate();
   } catch( std::exception& e ) {
     result = 1;

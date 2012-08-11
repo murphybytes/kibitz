@@ -11,7 +11,7 @@ namespace kibitz {
   }
   
   void heartbeat_sender::operator()() {
-
+    DLOG(INFO) << "entered heartbeat sender thread";
 
   }
 

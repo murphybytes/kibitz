@@ -15,6 +15,7 @@ namespace kibitz {
     void* zmq_context_;
     bool signalled_;
     callback heartbeat_handler_;
+    thread_group threads_;
 
   public:
     context( const po::variables_map& application_configuration );
@@ -25,7 +26,7 @@ namespace kibitz {
     void start() ;
     void stop() ;
     void terminate();
-    
+    void* zmq_context() ;
   };
 
   typedef shared_ptr< context > context_ptr;

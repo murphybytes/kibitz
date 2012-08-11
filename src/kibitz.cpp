@@ -51,7 +51,7 @@ namespace kibitz {
 
   void start() {
     assert( context_ );
-
+    context_->start();
   }
 
   void terminate() {
