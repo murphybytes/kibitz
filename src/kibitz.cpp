@@ -4,7 +4,7 @@
 
 
 namespace kibitz {
-  static context* context_ptr = NULL;
+  static context_ptr context_;
 
   void validate_command_line( const po::variables_map& command_line ) {
 
@@ -15,12 +15,11 @@ namespace kibitz {
     if( !command_line.count( "worker-type" ) ) {
       throw runtime_error(  string("Missing required worker-type argument") );
     }
-  
 
   } 
 
   void initialize( int argc, char* argv[] ) {
-    assert( NULL == context_ptr );
+    assert( !context_ );
     InitGoogleLogging( argv[0] );
     InstallFailureSignalHandler();
     DLOG(INFO) << "initialize start";
@@ -47,16 +46,17 @@ namespace kibitz {
 
     validate_command_line( command_line );
  
-    context_ptr = new context( command_line );
+    context_=  context_ptr( new context( command_line ) );
   }
 
-  
+  void start() {
+    assert( context_ );
+
+  }
 
   void terminate() {
-    if( context_ptr ) {
-      context_ptr->terminate();
-      delete context_ptr;
-      context_ptr = NULL;
+    if( context_ ) {
+      context_->terminate();
     }
   }
   

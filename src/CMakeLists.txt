@@ -6,13 +6,14 @@ add_library( kibitz SHARED
   kibitz.cpp
   heartbeat_sender.cpp
   context.cpp
-  
+  message_base.cpp
 )
 
 target_link_libraries( kibitz
   boost_program_options
   boost_filesystem
   boost_system
+  boost_thread
   glog
   zmq
 )
