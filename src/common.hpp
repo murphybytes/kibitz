@@ -17,6 +17,7 @@
 #include <boost/format.hpp>
 #include <boost/thread.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/bind.hpp>
 
 using std::string;
 using std::stringstream;

@@ -9,6 +9,10 @@ namespace kibitz {
 
   heartbeat_sender::~heartbeat_sender() {
   }
+  
+  void heartbeat_sender::operator()() {
 
+
+  }
 
 }

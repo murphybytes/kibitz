@@ -12,7 +12,7 @@ namespace kibitz {
     heartbeat_sender( context_ptr context ) ; 
 
     ~heartbeat_sender();  
-    
+    void operator()();
   };
 
 
