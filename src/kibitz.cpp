@@ -1,10 +1,17 @@
 #include "kibitz.hpp"
 #include "heartbeat_sender.hpp"
 #include "context.hpp"
+#include <signal.h>
 
 
 namespace kibitz {
   static context_ptr context_;
+
+  void catch_sig_int( int sig ) {
+    context_->send_internal_message( SHUTDOWN_MSG );
+  }
+
+  
 
   void validate_command_line( const po::variables_map& command_line ) {
 
@@ -20,6 +27,7 @@ namespace kibitz {
 
   void initialize( int argc, char* argv[] ) {
     assert( !context_ );
+
     InitGoogleLogging( argv[0] );
     InstallFailureSignalHandler();
     DLOG(INFO) << "initialize start";
@@ -47,6 +55,7 @@ namespace kibitz {
     validate_command_line( command_line );
  
     context_=  context_ptr( new context( command_line ) );
+    signal( SIGINT, catch_sig_int );
   }
 
   void start() {

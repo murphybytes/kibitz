@@ -7,6 +7,7 @@ add_library( kibitz SHARED
   heartbeat_sender.cpp
   context.cpp
   message_base.cpp
+  common.cpp
 )
 
 target_link_libraries( kibitz

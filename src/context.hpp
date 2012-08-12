@@ -13,6 +13,7 @@ namespace kibitz {
     string worker_id_;
     po::variables_map application_configuration_;
     void* zmq_context_;
+    void* message_bus_socket_;
     bool signalled_;
     callback heartbeat_handler_;
     thread_group threads_;
@@ -27,6 +28,7 @@ namespace kibitz {
     void stop() ;
     void terminate();
     void* zmq_context() ;
+    void send_internal_message( const char* message ) ;
   };
 
   typedef shared_ptr< context > context_ptr;
