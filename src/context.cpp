@@ -43,7 +43,7 @@ namespace kibitz {
   }
 
   void context::start() {
-    heartbeat_sender hb_sender( context_ptr(this) );
+    heartbeat_sender hb_sender( this );
     threads_.create_thread(hb_sender);
     threads_.join_all();
 

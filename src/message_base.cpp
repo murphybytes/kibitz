@@ -5,14 +5,13 @@
 namespace kibitz {
 
 
-  message_base::message_base( context_ptr context ) 
-    :shutdown_(shared_ptr<bool>(new bool(false))),
-     context_( context ),
-     thread_( shared_ptr<boost::thread>(new boost::thread(boost::bind( &message_base::internal_command_handler, this ))) ) {
-
+  message_base::message_base( context* context ) 
+    :shutdown_(new bool(false)),
+     context_( context ) {
   }
 
   message_base::~message_base() {
+    //delete shutdown_;
   }
 
   bool message_base::shutdown() const {
@@ -42,7 +41,6 @@ namespace kibitz {
     
 
     while( true ) {
-
       string message;
       kibitz::recv( socket, message );
       DLOG(INFO) << "Message bus received " << message ;

@@ -11,20 +11,19 @@ namespace kibitz {
 
 
   protected:
-    context_ptr context_;
-    shared_ptr<boost::thread> thread_;
-    shared_ptr<bool> shutdown_;
-    void internal_command_handler(   );
+    bool* shutdown_;
+    context* context_;
 
 
+    
 
   
   public:
-    message_base( context_ptr context ) ;
+    message_base( context* context ) ;
     ~message_base(); 
 
     bool shutdown() const ;
-  
+    void internal_command_handler(   );  
   };
 
 }

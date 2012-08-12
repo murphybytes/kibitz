@@ -9,7 +9,7 @@ namespace kibitz {
   class heartbeat_sender : public message_base {
 
   public:
-    heartbeat_sender( context_ptr context ) ; 
+    heartbeat_sender( context* context ) ; 
 
     ~heartbeat_sender();  
     void operator()();
