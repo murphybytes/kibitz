@@ -24,6 +24,10 @@ namespace kibitz {
   context::~context() {
   }
 
+  const po::variables_map& context::get_config() const {
+    return application_configuration_;
+  } 
+
   void context::send_internal_message( const char* message ) {
     string s( message );
     DLOG(INFO) << "sending internal message -> " << message;

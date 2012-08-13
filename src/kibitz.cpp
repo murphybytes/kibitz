@@ -23,6 +23,10 @@ namespace kibitz {
       throw runtime_error(  string("Missing required worker-type argument") );
     }
 
+    if( !command_line.count( "multicast-binding" ) ) {
+      throw runtime_error( string( "Missing required multicast-binding argument") );
+    }
+
   } 
 
   void initialize( int argc, char* argv[] ) {
@@ -39,6 +43,8 @@ namespace kibitz {
       ( "help,h", "Show help message" )
       ( "worker-id,I", po::value< int >(), "(Required) Integer that identifies worker. Must be unique with worker type" )
       ( "worker-type,T", po::value< string >(), "(Required) Name of the type of worker." )
+      ( "multicast-binding,b", po::value<string>(), "(Required) zmq epgm multicast binding" )
+      ( "tcp-port,p", po::value<int>()->default_value(8999), "Port for tcp based zmq messages" )
       ( "context-threads,t", po::value< int >()->default_value( 1 ), "Thread count passed to zmq_init" )
       ;
     po::variables_map command_line;

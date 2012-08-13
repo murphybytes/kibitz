@@ -8,6 +8,7 @@ add_library( kibitz SHARED
   context.cpp
   message_base.cpp
   common.cpp
+  heartbeat.cpp
 )
 
 target_link_libraries( kibitz
@@ -17,8 +18,11 @@ target_link_libraries( kibitz
   boost_thread
   glog
   zmq
+  
 )
 
 add_executable( test-worker-a  test_worker_a.cpp )
+add_executable( unit-test unit_test.cpp )
 
 target_link_libraries( test-worker-a kibitz )
+target_link_libraries( unit-test kibitz )

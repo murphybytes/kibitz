@@ -29,6 +29,7 @@ namespace kibitz {
     void terminate();
     void* zmq_context() ;
     void send_internal_message( const char* message ) ;
+    const po::variables_map& get_config() const; 
   };
 
   typedef shared_ptr< context > context_ptr;
