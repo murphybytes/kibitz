@@ -1,7 +1,7 @@
 #ifndef __HEARTBEAT_HPP__
 #define __HEARTBEAT_HPP__
 
-
+// TODO: extend notification message
 
 #include "kibitz.hpp"
 #include "context.hpp"
