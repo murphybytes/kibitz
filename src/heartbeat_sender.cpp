@@ -33,6 +33,7 @@ namespace kibitz {
     heartbeat beater( context_ );
 
     while(!shutdown()) {
+      // TODO: heartbeat freq configurable
       sleep( 2 );
       DLOG(INFO) << "Heartbeat" << beater.to_json()  ;
       send( socket, beater.to_json() );

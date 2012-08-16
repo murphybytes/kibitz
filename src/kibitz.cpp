@@ -1,6 +1,6 @@
 #include "kibitz.hpp"
 #include "context.hpp"
-#include "heartbeat_sender.hpp"
+//#include "heartbeat_sender.hpp"
 #include <signal.h>
 
 
@@ -47,14 +47,14 @@ namespace kibitz {
       ( "worker-type,T", po::value< string >(), "(Required) Name of the type of worker." )
       ( "multicast-binding,b", po::value<string>(), "(Required) zmq epgm multicast binding" )
       ( "tcp-port,p", po::value<int>()->default_value(8999), "Port for tcp based zmq messages" )
-      ( "context-threads,t", po::value< int >()->default_value( 1 ), "Thread count passed to zmq_init" )
+      ( "context-threads,t", po::value< int >()->default_value( 5 ), "Thread count passed to zmq_init" )
       ;
     po::variables_map command_line;
     po::store( po::parse_command_line( argc, argv, options ), command_line );
     po::notify( command_line );
 
 
-    if( command_line.count( "help" ) ) {
+   if( command_line.count( "help" ) ) {
       std::cout << options << std::endl;
       exit( 1 );
     }

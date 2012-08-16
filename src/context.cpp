@@ -1,6 +1,6 @@
 #include "context.hpp"
 #include "heartbeat_sender.hpp"
-
+#include "heartbeat_receiver.hpp"
 namespace kibitz {
 
 
@@ -48,7 +48,10 @@ namespace kibitz {
 
   void context::start() {
     heartbeat_sender hb_sender( this );
+    heartbeat_receiver hb_receiver( this );
+
     threads_.create_thread(hb_sender);
+    threads_.create_thread(hb_receiver);
     threads_.join_all();
 
   }
