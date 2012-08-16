@@ -1,11 +1,13 @@
 #include "kibitz.hpp"
-#include "heartbeat_sender.hpp"
 #include "context.hpp"
+#include "heartbeat_sender.hpp"
 #include <signal.h>
 
 
 namespace kibitz {
-  static context_ptr context_;
+  context* context_ =  NULL;
+
+
 
   void catch_sig_int( int sig ) {
     context_->send_internal_message( SHUTDOWN_MSG );
@@ -60,7 +62,7 @@ namespace kibitz {
 
     validate_command_line( command_line );
  
-    context_=  context_ptr( new context( command_line ) );
+    context_=  new context( command_line ) ;
     signal( SIGINT, catch_sig_int );
   }
 

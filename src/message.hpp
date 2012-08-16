@@ -1,4 +1,7 @@
-// TODO: abstract base for all messages
+
+
+#ifndef __MESSAGE_HPP__
+#define __MESSAGE_HPP__
 
 
 #include "kibitz.hpp"
@@ -17,3 +20,6 @@ namespace kibitz {
 
   message_ptr message_factory( const string& json ) ;
 }
+
+
+#endif

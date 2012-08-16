@@ -1,4 +1,5 @@
 #!/bin/bash
 
 
-GLOG_logtostderr=1 ./test-worker-a --worker-id=1 --worker-type=test_worker_a
+GLOG_logtostderr=1 ./test-worker-a --worker-id=1 --worker-type=test_worker_a --multicast-binding='epgm://wlan0;239.192.1.1:5555'
+

@@ -22,6 +22,9 @@ int test_main( int argc, char* argv[] ) {
   kibitz::heartbeat heartbeat( &context );
   string json = heartbeat.to_json() ;
   BOOST_CHECK( !json.empty() );
-
+  kibitz::message_ptr message = kibitz::message_factory( json );
+  BOOST_CHECK( message != NULL );
+  shared_ptr<kibitz::heartbeat> heartbeat_ptr = boost::dynamic_pointer_cast<kibitz::heartbeat>( message );
+  BOOST_CHECK( heartbeat_ptr != NULL );
   return 0;
 }

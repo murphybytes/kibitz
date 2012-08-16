@@ -1,3 +1,6 @@
+#ifndef heartbeat_hpp
+#define heartbeat_hpp
+
 #include "heartbeat.hpp"
 
 namespace kibitz {
@@ -7,8 +10,19 @@ namespace kibitz {
      worker_id_( ctx->get_config()["worker-id"].as<int>() ),
      host_name_( "xxxx" ),
      pid_(getpid()),
-     port_(ctx->get_config()["tcp-port"].as<int>()) {
+     port_(ctx->get_config()["tcp-port"].as<int>()),
+     ticks_(0) {
 
+
+  }
+
+  heartbeat::heartbeat( context* ctx, const ptree& json ) 
+    :worker_type_( json.get<string>( "worker_type" ) ),
+     worker_id_( json.get<int>( "worker_id" ) ),
+     host_name_( json.get<string>( "host" )),
+     pid_( json.get<int>("process_id")),
+     port_( json.get<int>("port")),
+     ticks_(json.get<int>("ticks")) {
 
   }
 
@@ -21,6 +35,8 @@ namespace kibitz {
     clock_t ticks = clock();
     stringstream stm;
     ptree tree;
+    tree.put( "message_type", "notification" );
+    tree.put( "notification_type", "heartbeat" );
     tree.put( "worker_type", worker_type_ );
     tree.put( "worker_id", worker_id_ );
     tree.put( "host", host_name_ );
@@ -34,3 +50,6 @@ namespace kibitz {
 
 
 }
+
+
+#endif

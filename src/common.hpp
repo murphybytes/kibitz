@@ -48,6 +48,10 @@ namespace kibitz {
 
   void recv( void* socket, string& message  ) ;
   void send( void* socket, const string& message ) ;
+  // declared in kibitz.cpp
+  class context;
+  extern context* context_;
+
 }
 
 #endif 

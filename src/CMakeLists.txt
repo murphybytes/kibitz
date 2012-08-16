@@ -9,6 +9,8 @@ add_library( kibitz SHARED
   message_base.cpp
   common.cpp
   heartbeat.cpp
+  heartbeat_receiver.cpp
+  message.cpp
 )
 
 target_link_libraries( kibitz

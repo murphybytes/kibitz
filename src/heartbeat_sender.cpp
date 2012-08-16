@@ -1,3 +1,4 @@
+#include "heartbeat.hpp"
 #include "heartbeat_sender.hpp"
 
 
@@ -29,9 +30,12 @@ namespace kibitz {
       return;
     }
 
+    heartbeat beater( context_ );
+
     while(!shutdown()) {
       sleep( 2 );
-      DLOG(INFO) << "Heartbeat" ;
+      DLOG(INFO) << "Heartbeat" << beater.to_json()  ;
+      send( socket, beater.to_json() );
     }
 
     zmq_close( socket );

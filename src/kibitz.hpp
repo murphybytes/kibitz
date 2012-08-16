@@ -13,7 +13,7 @@ namespace kibitz {
   void start() ;
   void terminate();
 
-
+  
 
 }
 
