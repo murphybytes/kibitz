@@ -16,21 +16,21 @@ namespace kibitz {
 
     boost::thread message_bus_listener( boost::bind( &message_base::internal_command_handler, this ) );
     
-    void* socket = zmq_socket(context_->zmq_context(), ZMQ_PUB );
+    void* socket = zmq_socket(context_->zmq_context(), ZMQ_PUSH );
     if( !socket ) {
       LOG(ERROR) << "Unable to create heartbeat sender socket";
       return;
     }
 
-    const char* multicast_binding = context_->get_config()["multicast-binding"].as<string>().c_str();
-    int rc = zmq_connect( socket, multicast_binding );
+    const char* binding = context_->get_config()["heartbeat-binding"].as<string>().c_str();
+    int rc = zmq_connect( socket, binding );
 
     if( rc ) {
-      LOG(ERROR) << "Attempt to subscribe to multicast channel " << multicast_binding << " failed.";
+      LOG(ERROR) << "Attempt to subscribe to multicast channel " << binding << " failed.";
       return;
     }
 
-    heartbeat beater( context_ );
+    heartbeat beater( context_->get_config() );
 
     while(!shutdown()) {
       // TODO: heartbeat freq configurable

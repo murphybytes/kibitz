@@ -1,5 +1,5 @@
 #include <boost/test/minimal.hpp>
-
+#include "common.hpp"
 #include "heartbeat.hpp"
 
 
@@ -18,8 +18,7 @@ int test_main( int argc, char* argv[] ) {
   po::store( po::parse_command_line( argc, argv, options ), command_line );
   po::notify( command_line );
 
-  kibitz::context context( command_line );
-  kibitz::heartbeat heartbeat( &context );
+  kibitz::heartbeat heartbeat( command_line );
   string json = heartbeat.to_json() ;
   BOOST_CHECK( !json.empty() );
   kibitz::message_ptr message = kibitz::message_factory( json );

@@ -2,8 +2,7 @@
 #define __HEARTBEAT_HPP__
 
 
-#include "kibitz.hpp"
-#include "context.hpp"
+
 #include "notification_message.hpp"
 
 namespace kibitz {
@@ -16,11 +15,12 @@ namespace kibitz {
     int port_;
     int ticks_;
   public :
-    heartbeat(context* ctx) ;
-    heartbeat( context* ctx, const ptree& json );
+    heartbeat(const boost::program_options::variables_map& config) ;
+    heartbeat( const ptree& json );
     virtual ~heartbeat() ;
     virtual string to_json() const ;
-    
+    bool operator<(const heartbeat& comp ) const ;
+    const string& key() const ;
   };
 
 }

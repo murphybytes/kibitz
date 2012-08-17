@@ -3,20 +3,21 @@
 
 #include "heartbeat.hpp"
 
+
 namespace kibitz {
 
-  heartbeat::heartbeat( context* ctx ) 
-    :worker_type_( ctx->get_config()["worker-type"].as<string>()  ),
-     worker_id_( ctx->get_config()["worker-id"].as<int>() ),
+  heartbeat::heartbeat( const boost::program_options::variables_map& config  ) 
+    :worker_type_( config["worker-type"].as<string>()  ),
+     worker_id_( config["worker-id"].as<int>() ),
      host_name_( "xxxx" ),
      pid_(getpid()),
-     port_(ctx->get_config()["tcp-port"].as<int>()),
+     port_( config["tcp-port"].as<int>()),
      ticks_(0) {
 
 
   }
 
-  heartbeat::heartbeat( context* ctx, const ptree& json ) 
+  heartbeat::heartbeat(  const ptree& json ) 
     :worker_type_( json.get<string>( "worker_type" ) ),
      worker_id_( json.get<int>( "worker_id" ) ),
      host_name_( json.get<string>( "host" )),
@@ -43,8 +44,20 @@ namespace kibitz {
     tree.put( "process_id", pid_ );
     tree.put( "port" , port_ );
     tree.put( "ticks", ticks );
-    pt::json_parser::write_json( stm, tree );
+    boost::property_tree::json_parser::write_json( stm, tree );
     return stm.str();
+  }
+
+  bool heartbeat::operator<(const heartbeat& comp ) const {
+    if( worker_type_ < comp.worker_type_ ) {
+      return worker_id_ < comp.worker_id_ ;
+    }
+
+    return false;
+  }
+
+  const string& heartbeat::key() const {
+    return worker_type_;
   }
 
 

@@ -8,7 +8,7 @@ namespace kibitz {
     
     const string notification_type = tree.get<string>( "notification_type" );
     if( notification_type == "heartbeat" ) {
-      result = message_ptr( new heartbeat( context_, tree ) );
+      result = message_ptr( new heartbeat(  tree ) );
     }
 
     return result;
@@ -24,7 +24,7 @@ namespace kibitz {
     stringstream sstm;
     sstm << json;
     ptree tree;
-    pt::json_parser::read_json( sstm, tree );
+    boost::property_tree::json_parser::read_json( sstm, tree );
     const string message_type = tree.get<string>( "message_type" );
 
     if( message_type == "notification" ) {

@@ -23,7 +23,7 @@ namespace kibitz {
     }
     
 
-    const char* multicast_binding = context_->get_config()["multicast-binding"].as<string>().c_str() ;
+    const char* multicast_binding = context_->get_config()["discovery-binding"].as<string>().c_str() ;
     
     int rc = zmq_connect( socket, multicast_binding );
 

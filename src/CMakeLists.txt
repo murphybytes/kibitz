@@ -23,8 +23,24 @@ target_link_libraries( kibitz
   
 )
 
+
+
 add_executable( test-worker-a  test_worker_a.cpp )
 add_executable( unit-test unit_test.cpp )
+add_executable( locator 
+  locator.cpp 
+  registry.cpp
+  heartbeat.cpp
+)
 
 target_link_libraries( test-worker-a kibitz )
 target_link_libraries( unit-test kibitz )
+
+target_link_libraries( locator 
+  boost_program_options
+  boost_filesystem
+  boost_system
+  boost_thread
+  glog
+  zmq
+)
