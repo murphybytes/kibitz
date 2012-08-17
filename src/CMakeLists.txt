@@ -2,6 +2,8 @@ cmake_minimum_required ( VERSION 2.8 )
 project (kibitz) 
 set ( CMAKE_CXX_FLAGS "-g" )
 
+
+
 add_library( kibitz SHARED
   kibitz.cpp
   heartbeat_sender.cpp
@@ -14,10 +16,10 @@ add_library( kibitz SHARED
 )
 
 target_link_libraries( kibitz
-  boost_program_options
-  boost_filesystem
-  boost_system
-  boost_thread
+  boost_program_options-mt
+  boost_filesystem-mt
+  boost_system-mt
+  boost_thread-mt
   glog
   zmq
   
@@ -37,10 +39,10 @@ target_link_libraries( test-worker-a kibitz )
 target_link_libraries( unit-test kibitz )
 
 target_link_libraries( locator 
-  boost_program_options
-  boost_filesystem
-  boost_system
-  boost_thread
+  boost_program_options-mt
+  boost_filesystem-mt
+  boost_system-mt
+  boost_thread-mt
   glog
   zmq
 )
