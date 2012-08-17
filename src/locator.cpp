@@ -49,8 +49,8 @@ int main( int argc, char* argv[] ) {
   po::options_description options( "locator" );
   options.add_options()
     ( "help,h", "Show help message" )
-    ("heartbeat-binding,b", po::value<string>(), "Multicast binding to receive heartbeats" )
-    ("port,p", po::value<int>(), "Port used to distribute locator messages" )
+    ("heartbeat-binding,b", po::value<string>()->default_value("tcp://*:5556"), "Multicast binding to receive heartbeats" )
+    ("port,p", po::value<int>()->default_value(5557), "Port used to distribute locator messages" )
     ("context-threads,t", po::value<int>()->default_value(1), "zmq context thread count")
     ;
 
@@ -59,7 +59,7 @@ int main( int argc, char* argv[] ) {
   po::notify( command_line );
 
   const char* in_binding = command_line["heartbeat-binding"].as<string>().c_str() ;
-  const char* out_binding = command_line["discovery-binding"].as<string>().c_str() ;
+  const int port = command_line["port"].as<int>() ;
 
   int rc = 0;
 

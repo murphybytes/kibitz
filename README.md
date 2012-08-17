@@ -6,6 +6,8 @@ A message centric grid computing environment
 Building
 ------------
 
+Currently I've managed to build and run kibitz on Ubuntu and Mac OS X 10.7.4
+
 CMake is required to build kibitz. Generate a make file like so:
 
 ```
@@ -37,5 +39,8 @@ brew install boost
 glog 0.3.2
 
 http://code.google.com/p/google-glog/
+
+Mac OSX
+brew install glog
 
 
