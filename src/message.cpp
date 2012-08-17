@@ -1,5 +1,5 @@
 #include "heartbeat.hpp"
-
+#include "inproc_notification_message.hpp"
 
 namespace kibitz {
 
@@ -9,6 +9,10 @@ namespace kibitz {
     const string notification_type = tree.get<string>( "notification_type" );
     if( notification_type == "heartbeat" ) {
       result = message_ptr( new heartbeat(  tree ) );
+    }
+
+    if( notification_type == "inproc" ) {
+      result = message_ptr( new inproc_notification_message( tree ) );
     }
 
     return result;

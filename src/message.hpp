@@ -17,11 +17,17 @@ using std::string;
 using std::stringstream;
 
 namespace kibitz {
+  
 
   class message {
+    const string message_class_;
+  protected :
+    message( const string& message_class )
+      :message_class_(message_class) {}
   public:
+    static const int stop = 0;
     virtual string to_json() const = 0;
-
+    const string& message_class() const { return message_class_; }
   };
 
 

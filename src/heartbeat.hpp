@@ -21,6 +21,7 @@ namespace kibitz {
     virtual string to_json() const ;
     bool operator<(const heartbeat& comp ) const ;
     const string& key() const ;
+    //virtual message_type_t message_type() const { return heartbeat; }
   };
 
 }

@@ -17,7 +17,6 @@ class registry {
   typedef multimap< string, kibitz::heartbeat > map_t;
   typedef shared_ptr< map_t > map_ptr_t;
 
-  boost::mutex guard_;
   map_ptr_t map_ptr_;
   void* context_;
   int port_;
@@ -25,8 +24,9 @@ public:
   registry( void* context, int port ); 
   virtual ~registry() ;
   void push_message( const string& msg ) ;
+  void push_message( const kibitz::message& message );
   void operator() () ;
-  
+
 
 };
 

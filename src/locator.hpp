@@ -3,11 +3,12 @@
 
 
 #include "heartbeat.hpp"
+#include "inproc_notification_message.hpp"
 #include <glog/logging.h>
 #include <string>
+#include "kibitz_util.hpp"
 
-using std::string;
+static const char* inproc_binding = "inproc://#1";
 
-int recv( void* context, string& message, int flag = 0 );
 
 #endif

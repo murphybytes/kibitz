@@ -13,7 +13,10 @@ CMake is required to build kibitz. Generate a make file like so:
 ```
 cd src
 cmake .
+make
 ```
+
+Binaries will be found in the src directory after building.
 
 Dependencies
 ------------

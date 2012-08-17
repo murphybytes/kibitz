@@ -9,10 +9,12 @@
 #include <boost/thread.hpp>
 
 #include "registry.hpp"
+
+
 using namespace google;
 using std::string;
 namespace po = boost::program_options;
-
+/*
 int recv( void* socket, string& message, int flag) {
   assert( message.empty() );
   const int buffer_size = 2048;
@@ -22,13 +24,14 @@ int recv( void* socket, string& message, int flag) {
     int err = zmq_errno() ;
     if( err == EAGAIN ) {
       LOG(INFO) << "Waiting for messages";
-      sleep( 1 );
+      //      sleep( 1 );
     }
   } else {
     message.append( buffer, received ) ;
   }
   return received;
 }
+*/
 
 
 
@@ -60,7 +63,7 @@ int main( int argc, char* argv[] ) {
 
   const char* in_binding = command_line["heartbeat-binding"].as<string>().c_str() ;
   const int port = command_line["port"].as<int>() ;
-
+  int exit_code = 0;
   int rc = 0;
 
   if( command_line.count("help") ) {
@@ -86,52 +89,39 @@ int main( int argc, char* argv[] ) {
     }
 
 
-
-    
-    /*
-    void* outsocket = zmq_socket( context, ZMQ_PUB ) ;
-
-    if( !outsocket ) {
-      LOG(ERROR) << "Could not create outbound socket. Error " << zmq_errno() ;
-      exit( 1 );
-    }
-
-    rc = zmq_connect( outsocket, out_binding );
-
-    if( rc ) {
-      LOG(ERROR) << "Could not connect broadcast socket " << out_binding << " " << zmq_errno() ;
-      exit( 1 ); 
-    }
-
-    */
-
-    //std::multimap<string, heartbeat > heartbeats;
     registry reg( context, command_line["port"].as<int>() );
+    boost::thread sender_thread( reg );
 
-    while( true ) {
-      string message;
-      recv( insocket, message, ZMQ_DONTWAIT );
-      if( !message.empty() ) {
-	DLOG(INFO) << "got message -> " << message ;
-	//	send( outsocket, message );
-	reg.push_message(  message  );
+    try {
+      while( true ) {
+	string message;
+	kibitz::util::recv( insocket, message );
+	if( !message.empty() ) {
+	  DLOG(INFO) << "got message -> " << message ;
+	  //	send( outsocket, message );
+	  reg.push_message(  message  );
 	
-      }
+	}
       
+      }
+    } catch( const kibitz::util::queue_interrupt& ) {
+      LOG(INFO) << "Caught signal shutting down" ;
+    } catch( const std::exception& ex ) {
+      LOG(ERROR) << "Something bad killed us. What => " << ex.what() ;
+      exit_code = 1;
     }
+
+    kibitz::inproc_notification_message inproc_notification_message( kibitz::message::stop );
+    reg.push_message( inproc_notification_message );
+    sender_thread.join();
 
     zmq_close( insocket ) ;
-    //zmq_close( outsocket ) ;
-
-
-
-
     zmq_term( context );
   }
 
   
 
-  return 0;
+  return exit_code;
 
 }
 

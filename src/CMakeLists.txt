@@ -2,6 +2,11 @@ cmake_minimum_required ( VERSION 2.8 )
 project (kibitz) 
 set ( CMAKE_CXX_FLAGS "-g" )
 
+add_library( kibitz_messages SHARED 
+  heartbeat.cpp
+  message.cpp
+  inproc_notification_message.cpp
+)
 
 
 add_library( kibitz SHARED
@@ -10,12 +15,21 @@ add_library( kibitz SHARED
   context.cpp
   message_base.cpp
   common.cpp
-  heartbeat.cpp
   heartbeat_receiver.cpp
-  message.cpp
+  kibitz_util.cpp
+)
+
+add_library( locator SHARED
+  registry.cpp
+  kibitz_util.cpp
+)
+
+target_link_libraries( kibitz_messages 
+  boost_program_options-mt
 )
 
 target_link_libraries( kibitz
+  kibitz_messages		       
   boost_program_options-mt
   boost_filesystem-mt
   boost_system-mt
@@ -25,20 +39,8 @@ target_link_libraries( kibitz
   
 )
 
-
-
-add_executable( test-worker-a  test_worker_a.cpp )
-add_executable( unit-test unit_test.cpp )
-add_executable( locator 
-  locator.cpp 
-  registry.cpp
-  heartbeat.cpp
-)
-
-target_link_libraries( test-worker-a kibitz )
-target_link_libraries( unit-test kibitz )
-
-target_link_libraries( locator 
+target_link_libraries( locator
+  kibitz_messages 
   boost_program_options-mt
   boost_filesystem-mt
   boost_system-mt
@@ -46,3 +48,16 @@ target_link_libraries( locator
   glog
   zmq
 )
+
+
+
+
+add_executable( test-worker-a  test_worker_a.cpp )
+add_executable( unit-test unit_test.cpp )
+add_executable( worker-locator locator.cpp ) 
+
+
+target_link_libraries( test-worker-a kibitz )
+target_link_libraries( unit-test kibitz )
+target_link_libraries( worker-locator locator )
+

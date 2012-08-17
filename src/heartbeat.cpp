@@ -7,7 +7,8 @@
 namespace kibitz {
 
   heartbeat::heartbeat( const boost::program_options::variables_map& config  ) 
-    :worker_type_( config["worker-type"].as<string>()  ),
+    :notification_message( "heartbeat" ),
+     worker_type_( config["worker-type"].as<string>()  ),
      worker_id_( config["worker-id"].as<int>() ),
      host_name_( "xxxx" ),
      pid_(getpid()),
@@ -18,7 +19,8 @@ namespace kibitz {
   }
 
   heartbeat::heartbeat(  const ptree& json ) 
-    :worker_type_( json.get<string>( "worker_type" ) ),
+    :notification_message( "heartbeat" ),
+     worker_type_( json.get<string>( "worker_type" ) ),
      worker_id_( json.get<int>( "worker_id" ) ),
      host_name_( json.get<string>( "host" )),
      pid_( json.get<int>("process_id")),
