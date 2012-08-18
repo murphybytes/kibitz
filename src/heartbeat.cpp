@@ -58,7 +58,13 @@ namespace kibitz {
 
   bool heartbeat::operator<(const heartbeat& comp ) const {
     if( worker_type_ < comp.worker_type_ ) {
-      return worker_id_ < comp.worker_id_ ;
+      return true;
+    }
+
+    if( worker_type_ == comp.worker_type_ ) {
+      if( worker_id_ < comp.worker_id_ ) {
+	return true;
+      }
     }
 
     return false;
