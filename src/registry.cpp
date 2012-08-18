@@ -12,10 +12,24 @@ using boost::dynamic_pointer_cast;
 registry::registry( void* context, int port ) 
   :map_ptr_( new map_t() ),
    context_( context ),
-   port_(port) {
+   port_(port),
+   inproc_socket_(0) {
+  inproc_socket_ = zmq_socket( context_, ZMQ_PUB );
+  if( !inproc_socket_ ) {
+    throw runtime_error( "could not create socket" );
+  }
+  
+  int rc = zmq_bind( inproc_socket_, "inproc://x" );
+  if( rc ) {
+    throw runtime_error( "could not bind to inproc socket" );
+  }
+  
 }
 
 registry::~registry() {
+  if( inproc_socket_ ) {
+    zmq_close( inproc_socket_ );
+  }
 }
 
 
@@ -36,7 +50,31 @@ void registry::push_message( const kibitz::message& message ) {
 
 
 void registry::operator()() {
+  
   DLOG(INFO) << "starting registry thread";
+  
+  void* message_sock = zmq_socket( context_, ZMQ_SUB );
+
+  if( !message_sock ) {
+    LOG(ERROR) << "Could not create inproc socket " << zmq_errno() ;
+    return;
+  }
+
+  int rc = zmq_setsockopt( message_sock, ZMQ_SUBSCRIBE, "", 0 );
+
+  if( rc ) {
+    LOG(ERROR) << "Could not create subscription errno " << zmq_errno();
+    return;
+  }
+
+  rc = zmq_connect( message_sock, "inproc://x" );
+
+  if( rc ) {
+    LOG(ERROR) << "Could bind to inproc subscription " << zmq_errno() ;
+    return;
+  }
+
+
   stringstream stm;
   stm << "tcp://*:" << port_;
   void* send_socket = zmq_socket( context_, ZMQ_PUB );
@@ -45,31 +83,10 @@ void registry::operator()() {
     return;
   }
 
-  int rc = zmq_bind( send_socket, stm.str().c_str() );
+  rc = zmq_bind( send_socket, stm.str().c_str() );
 
   if( rc ) {
     LOG(ERROR) << "Could not bind to " << stm.str() << " Error " << zmq_errno() ;
-    return;
-  }
-
-  void* inproc_socket = zmq_socket( context_, ZMQ_SUB );
-
-  if( !inproc_socket ) {
-    LOG(ERROR) << "Could not create inproc socket " << zmq_errno() ;
-    return;
-  }
-
-  rc = zmq_setsockopt( inproc_socket, ZMQ_SUBSCRIBE, "", 0 );
-
-  if( rc ) {
-    LOG(ERROR) << "Could not create subscription errno " << zmq_errno();
-    return;
-  }
-
-  rc = zmq_connect( inproc_socket, inproc_binding );
-
-  if( rc ) {
-    LOG(ERROR) << "Could bind to inproc subscription " << zmq_errno() ;
     return;
   }
 
@@ -77,7 +94,7 @@ void registry::operator()() {
   try {
     while( true ) {
       string message;
-      kibitz::util::recv( inproc_socket, message ) ;
+      kibitz::util::recv( message_sock, message ) ;
       kibitz::message_ptr message_ptr = kibitz::message_factory( message );
       assert( message_ptr->message_class() == "notification" );
       if( dynamic_pointer_cast<kibitz::notification_message>(message_ptr)->message_type() == "inproc" ) {
@@ -107,6 +124,6 @@ void registry::operator()() {
     LOG(ERROR) << "An exception killed sender thread " << __FILE__ << " " << __LINE__ ;
   }
 
-  zmq_close( inproc_socket );
+  zmq_close( message_sock );
   zmq_close( send_socket );
 }

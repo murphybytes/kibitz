@@ -8,7 +8,7 @@
 #include <string>
 #include "kibitz_util.hpp"
 
-static const char* inproc_binding = "inproc://#1";
+static const char* inproc_binding = "inproc://msgbus";
 
 
 #endif
