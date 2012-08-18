@@ -19,14 +19,14 @@ class registry {
 
 
   map_t map_;
-  void* context_;
+  void* publisher_socket_;
   void* inproc_pub_socket_;
   void* inproc_sub_socket_; 
-  int port_;
+
 
   bool one_second_elapsed( timeval& last_send ); 
 public:
-  registry( void* context, void* pub_socket, void* sub_socket, int port ); 
+  registry(  void* inproc_pub_socket, void* inproc_sub_socket, void* publisher_socket ); 
   virtual ~registry() ;
   void push_message( const string& msg ) ;
   void push_message( const kibitz::message& message );

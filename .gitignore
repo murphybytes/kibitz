@@ -18,3 +18,9 @@ Makefile
 cmake_install.cmake
 CMakeFiles
 CMakeCache.txt
+
+*.dylib
+unit-test
+worker-locator
+.DS_Store
+TAGS

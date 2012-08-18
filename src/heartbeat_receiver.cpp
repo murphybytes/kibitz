@@ -23,19 +23,19 @@ namespace kibitz {
     }
     
 
-    const char* multicast_binding = context_->get_config()["discovery-binding"].as<string>().c_str() ;
-    
-    int rc = zmq_connect( socket, multicast_binding );
+    const char* binding = context_->get_config()["discovery-binding"].as<string>().c_str() ;
+    LOG(INFO) << "Will subscribe to messages from locator on " << binding;
+    int rc = zmq_connect( socket, binding );
 
     if( rc ) {
-      LOG(ERROR) << "heartbeat receiver failed to connect to multicast " << multicast_binding ;
+      LOG(ERROR) << "heartbeat receiver failed to connect to binding " << binding ;
       return;
     }
 
     rc = zmq_setsockopt( socket, ZMQ_SUBSCRIBE, "", 0);
 
     if( rc ) {
-      LOG(ERROR) << "Attempt to set socket options failed. " << __FILE__ << " " << __LINE__;
+      LOG(ERROR) << "Attempt to set socket options failed. " ;
       return;
     }
 

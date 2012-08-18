@@ -34,7 +34,7 @@ namespace kibitz {
 
     while(!shutdown()) {
       // TODO: heartbeat freq configurable
-      sleep( 2 );
+      sleep( 5 );
       DLOG(INFO) << "Heartbeat" << beater.to_json()  ;
       send( socket, beater.to_json() );
     }

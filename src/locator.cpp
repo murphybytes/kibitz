@@ -7,10 +7,10 @@
 
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
-
+#include <boost/format.hpp>
 #include "registry.hpp"
 
-
+using boost::format;
 using namespace google;
 using std::string;
 namespace po = boost::program_options;
@@ -25,7 +25,7 @@ int main( int argc, char* argv[] ) {
   po::options_description options( "locator" );
   options.add_options()
     ( "help,h", "Show help message" )
-    ("heartbeat-binding,b", po::value<string>()->default_value("tcp://*:5556"), "Multicast binding to receive heartbeats" )
+    ("heartbeat-binding,b", po::value<string>()->default_value("tcp://*:5556"), "Binding to listen for worker heartbeats" )
     ("port,p", po::value<int>()->default_value(5557), "Port used to distribute locator messages" )
     ("context-threads,t", po::value<int>()->default_value(1), "zmq context thread count")
     ;
@@ -67,7 +67,12 @@ int main( int argc, char* argv[] ) {
     rc = zmq_connect( inproc_sub_socket, "inproc://x" );
     rc = zmq_setsockopt( inproc_sub_socket, ZMQ_SUBSCRIBE, "", 0 );
 
-    registry reg( context, inproc_pub_socket, inproc_sub_socket, command_line["port"].as<int>() );
+    void* outsocket = zmq_socket( context, ZMQ_PUB );
+    string pub_binding = (format( "tcp://*:%1%" ) % command_line["port"].as<int>()).str();
+    LOG(INFO) << "Locator will publish on " << pub_binding;
+    rc = zmq_bind( outsocket, pub_binding.c_str() );
+
+    registry reg(  inproc_pub_socket, inproc_sub_socket, outsocket );
     boost::thread sender_thread( reg );
 
     try {

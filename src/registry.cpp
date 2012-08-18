@@ -10,11 +10,10 @@ using boost::property_tree::ptree;
 using namespace google;
 using boost::dynamic_pointer_cast;
 
-registry::registry( void* context, void* pub_socket, void* sub_socket,  int port ) 
-  :context_( context ),
-   port_(port),
-   inproc_pub_socket_(pub_socket),
-   inproc_sub_socket_(sub_socket) {
+registry::registry( void* inproc_pub_socket, void* inproc_sub_socket,  void* publisher_socket ) 
+  :publisher_socket_( publisher_socket ),
+   inproc_pub_socket_(inproc_pub_socket),
+   inproc_sub_socket_(inproc_sub_socket) {
    }
 
 registry::~registry() {
@@ -38,21 +37,6 @@ void registry::push_message( const kibitz::message& message ) {
 void registry::operator()() {
   
   DLOG(INFO) << "starting registry thread";
-
-  stringstream stm;
-  stm << "tcp://*:" << port_;
-  void* send_socket = zmq_socket( context_, ZMQ_PUB );
-  if( !send_socket ) {
-    LOG(ERROR) << "Socket creation failed " << zmq_errno() ;
-    return;
-  }
-
-  int rc = zmq_bind( send_socket, stm.str().c_str() );
-
-  if( rc ) {
-    LOG(ERROR) << "Could not bind to " << stm.str() << " Error " << zmq_errno() ;
-    return;
-  }
 
   timeval last_send = { 0, 0 };
 
@@ -83,6 +67,9 @@ void registry::operator()() {
       if( dynamic_pointer_cast<kibitz::notification_message>(message_ptr)->message_type() == "heartbeat" ) {
 	DLOG(INFO) << "Sender thread got heartbeat" ;
 	kibitz::heartbeat hb = *dynamic_pointer_cast<kibitz::heartbeat>(message_ptr); 
+	kibitz::util::send( publisher_socket_, hb.to_json() );
+	DLOG(INFO) << "heartbeat sent" ;
+	/*
 	map_.insert( std::pair< string,  kibitz::heartbeat >( hb.key(), hb ) );
 	
 	if( one_second_elapsed( last_send ) ) {
@@ -92,6 +79,7 @@ void registry::operator()() {
 	  }
 
 	}
+	*/
       }
     }
   } catch( const kibitz::util::queue_interrupt& ) {
@@ -100,7 +88,7 @@ void registry::operator()() {
     LOG(ERROR) << "An exception killed sender thread " << __FILE__ << " " << __LINE__ ;
   }
 
-  zmq_close( send_socket );
+  
 }
 
 bool registry::one_second_elapsed( timeval& last_send ) {
