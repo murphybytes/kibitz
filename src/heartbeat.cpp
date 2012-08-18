@@ -6,6 +6,8 @@
 
 namespace kibitz {
 
+
+
   heartbeat::heartbeat( const boost::program_options::variables_map& config  ) 
     :notification_message( "heartbeat" ),
      worker_type_( config["worker-type"].as<string>()  ),
@@ -32,10 +34,14 @@ namespace kibitz {
   heartbeat::~heartbeat() {
   }
 
+  void heartbeat::increment_tick_count() {
+    static int counter = 0;
+    ticks_ = ++counter;
+  }
+
 
   string heartbeat::to_json() const {
 
-    clock_t ticks = clock();
     stringstream stm;
     ptree tree;
     tree.put( "message_type", "notification" );
@@ -45,7 +51,7 @@ namespace kibitz {
     tree.put( "host", host_name_ );
     tree.put( "process_id", pid_ );
     tree.put( "port" , port_ );
-    tree.put( "ticks", ticks );
+    tree.put( "ticks", ticks_ );
     boost::property_tree::json_parser::write_json( stm, tree );
     return stm.str();
   }
@@ -58,8 +64,12 @@ namespace kibitz {
     return false;
   }
 
-  const string& heartbeat::key() const {
+  const string& heartbeat::worker_type() const {
     return worker_type_;
+  }
+
+  const int& heartbeat::worker_id() const {
+    return worker_id_;
   }
 
 
