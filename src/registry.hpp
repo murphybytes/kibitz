@@ -7,6 +7,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 #include "heartbeat.hpp"
+#include <sys/time.h>
 
 using std::string;
 using std::multimap;
@@ -15,13 +16,15 @@ using std::pair;
 class registry {
 
   typedef multimap< string, kibitz::heartbeat > map_t;
-  typedef shared_ptr< map_t > map_ptr_t;
 
-  map_ptr_t map_ptr_;
+
+  map_t map_;
   void* context_;
   void* inproc_pub_socket_;
   void* inproc_sub_socket_; 
   int port_;
+
+  bool one_second_elapsed( timeval& last_send ); 
 public:
   registry( void* context, int port ); 
   virtual ~registry() ;

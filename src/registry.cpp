@@ -1,5 +1,6 @@
 #include "registry.hpp"
 #include <zmq.h>
+#include <sys/time.h>
 #include "locator.hpp"
 #include <sstream>
 #include <boost/property_tree/ptree.hpp>
@@ -10,8 +11,7 @@ using namespace google;
 using boost::dynamic_pointer_cast;
 
 registry::registry( void* context, int port ) 
-  :map_ptr_( new map_t() ),
-   context_( context ),
+  :context_( context ),
    port_(port),
    inproc_pub_socket_(0),
    inproc_sub_socket_(0) {
@@ -83,6 +83,7 @@ void registry::operator()() {
     return;
   }
 
+  timeval last_send = { 0, 0 };
 
   try {
     while( true ) {
@@ -109,6 +110,16 @@ void registry::operator()() {
 
       if( dynamic_pointer_cast<kibitz::notification_message>(message_ptr)->message_type() == "heartbeat" ) {
 	DLOG(INFO) << "Sender thread got heartbeat" ;
+	kibitz::heartbeat hb = *dynamic_pointer_cast<kibitz::heartbeat>(message_ptr); 
+	map_.insert( std::pair< string,  kibitz::heartbeat >( hb.key(), hb ) );
+	
+	if( one_second_elapsed( last_send ) ) {
+	  for( map_t::iterator it = map_.begin(); it != map_.end(); ++it ) {
+	    DLOG(INFO) << "Sending Message for " << it->second.key() ;
+	    kibitz::util::send( send_socket, it->second.to_json() );
+	  }
+
+	}
       }
     }
   } catch( const kibitz::util::queue_interrupt& ) {
@@ -119,4 +130,18 @@ void registry::operator()() {
 
   zmq_close( inproc_sub_socket_ );
   zmq_close( send_socket );
+}
+
+bool registry::one_second_elapsed( timeval& last_send ) {
+  bool second_elapsed = false;
+  timeval current_time;
+  gettimeofday( &current_time, NULL );
+  long curr_usec = (current_time.tv_sec * 10000) + current_time.tv_usec;
+  long last_usec = (last_send.tv_sec * 10000) +  last_send.tv_usec;
+  if( (curr_usec - last_usec) > 10000 ) {
+    last_send = current_time;
+    second_elapsed = true;
+  }
+  return second_elapsed;
+  
 }
