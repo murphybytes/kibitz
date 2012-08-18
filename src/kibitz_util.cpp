@@ -1,5 +1,6 @@
 #include <zmq.h>
 #include <assert.h>
+#include <string.h>
 #include "kibitz_util.hpp"
 
 namespace kibitz {
@@ -11,19 +12,27 @@ namespace kibitz {
     queue_interrupt::~queue_interrupt() throw() {
     }
 
+    void send( void* socket, const string& message ) {
+      zmq_msg_t msg;
+      zmq_msg_init_size( &msg, message.length() );
+      memcpy( zmq_msg_data( &msg ), message.data(), message.length() );
+      zmq_sendmsg( socket, &msg, 0 );
+      zmq_msg_close( &msg );
+    }
+
     void recv( void* socket, string& message ) {
       assert( message.empty() );
       zmq_msg_t msg;
       zmq_msg_init( &msg );
       int rc = zmq_recvmsg( socket, &msg, 0 );
 
-      if( rc ) {
+      if( rc < 0 ) {
 	int error = zmq_errno();
 	if( EINTR == error ) {
 	  throw queue_interrupt( "Received interrupt" );
 	} else {
 	  stringstream stm;
-	  stm << "Error " << error << " at " << __FILE__ << " " << __LINE__;
+	  stm << "Error " << error ;
 	  throw runtime_error( stm.str() );
 	}
       }

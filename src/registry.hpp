@@ -19,7 +19,8 @@ class registry {
 
   map_ptr_t map_ptr_;
   void* context_;
-  void* inproc_socket_;
+  void* inproc_pub_socket_;
+  void* inproc_sub_socket_; 
   int port_;
 public:
   registry( void* context, int port ); 

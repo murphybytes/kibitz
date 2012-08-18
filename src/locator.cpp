@@ -14,34 +14,7 @@
 using namespace google;
 using std::string;
 namespace po = boost::program_options;
-/*
-int recv( void* socket, string& message, int flag) {
-  assert( message.empty() );
-  const int buffer_size = 2048;
-  char buffer[buffer_size];
-  int received = zmq_recv( socket, buffer, buffer_size, flag );
-  if( received == -1 ) {
-    int err = zmq_errno() ;
-    if( err == EAGAIN ) {
-      LOG(INFO) << "Waiting for messages";
-      //      sleep( 1 );
-    }
-  } else {
-    message.append( buffer, received ) ;
-  }
-  return received;
-}
-*/
 
-
-
-
-void send( void* socket, const string& message ) {
-  int sent = zmq_send( socket, (void*)message.data(), message.length(), 0 );
-  if( sent == -1 ) {
-    LOG(ERROR) << "Could not send message. Err " << zmq_errno() << " Message " << message ;
-  }
-}
 
 int main( int argc, char* argv[] ) {
 

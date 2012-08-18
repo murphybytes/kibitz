@@ -12,10 +12,13 @@ namespace kibitz {
   }
 
   string inproc_notification_message::to_json() const {
+    stringstream stm;
     ptree tree;
     tree.put( "message_type", "notification" );
     tree.put( "notification_type", "inproc" );
     tree.put( "notification", notification_ );
+    boost::property_tree::json_parser::write_json( stm, tree );
+    return stm.str();
   }
   
 }

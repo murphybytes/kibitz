@@ -18,6 +18,6 @@ namespace kibitz {
     };
 
     void recv( void* socket, string& message ) ;
-    
+    void send( void* socket, const string& message );
   }
 }
