@@ -61,8 +61,13 @@ int main( int argc, char* argv[] ) {
       exit( 1 );
     }
 
+    void* inproc_pub_socket = zmq_socket( context, ZMQ_PUB );
+    rc = zmq_bind( inproc_pub_socket, "inproc://x" );
+    void* inproc_sub_socket = zmq_socket( context, ZMQ_SUB );
+    rc = zmq_connect( inproc_sub_socket, "inproc://x" );
+    rc = zmq_setsockopt( inproc_sub_socket, ZMQ_SUBSCRIBE, "", 0 );
 
-    registry reg( context, command_line["port"].as<int>() );
+    registry reg( context, inproc_pub_socket, inproc_sub_socket, command_line["port"].as<int>() );
     boost::thread sender_thread( reg );
 
     try {

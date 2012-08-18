@@ -26,7 +26,7 @@ class registry {
 
   bool one_second_elapsed( timeval& last_send ); 
 public:
-  registry( void* context, int port ); 
+  registry( void* context, void* pub_socket, void* sub_socket, int port ); 
   virtual ~registry() ;
   void push_message( const string& msg ) ;
   void push_message( const kibitz::message& message );
