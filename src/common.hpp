@@ -50,8 +50,7 @@ using namespace google;
 // misc helper functions
 namespace kibitz {
 
-  void recv( void* socket, string& message  ) ;
-  void send( void* socket, const string& message ) ;
+
   // declared in kibitz.cpp
   class context;
   extern context* context_;

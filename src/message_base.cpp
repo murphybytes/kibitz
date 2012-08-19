@@ -1,6 +1,11 @@
 
 #include "message_base.hpp"
+#include "kibitz_util.hpp"
 
+
+using kibitz::util::create_socket;
+using kibitz::util::close_socket;
+using kibitz::util::check_zmq;
 
 namespace kibitz {
 
@@ -20,39 +25,31 @@ namespace kibitz {
 
   void message_base::internal_command_handler( ) {
     DLOG(INFO) << "Created internal thread message handler";
-    void* socket = zmq_socket( context_->zmq_context(), ZMQ_SUB);
-    if( !socket ) {
-      LOG(ERROR) << "Unable to create socket for internal message bus errno = " << errno ;
-      return;
-    }
-
-    int rc = zmq_connect( socket, INPROC_COMMAND_BINDING ) ;
-    
-    if( rc ) {
-      LOG(ERROR) << "Could not connect to " << INPROC_COMMAND_BINDING << " error " << errno ;
-      return;
-    }
-
-    rc = zmq_setsockopt( socket, ZMQ_SUBSCRIBE, "", 0);
-
-    if( rc ) {
-      LOG(ERROR) << "setsockopt failed " << __FILE__ << " " << __LINE__ ;
-    }
+    void* socket = NULL;
+    try {
+      socket = create_socket(  context_->zmq_context(), ZMQ_SUB);
+      check_zmq( zmq_connect( socket, INPROC_COMMAND_BINDING ) );
+      check_zmq( zmq_setsockopt( socket, ZMQ_SUBSCRIBE, "", 0) );
     
 
-    while( true ) {
-      string message;
-      kibitz::recv( socket, message );
-      DLOG(INFO) << "Message bus received " << message ;
+      while( true ) {
+	string message;
+	kibitz::util::recv( socket, message );
+	DLOG(INFO) << "Message bus received " << message ;
 
-      if( message == SHUTDOWN_MSG ) {
-	DLOG(INFO) << "setting shutdown flag";
-	*shutdown_ = true;
-	break;
+	if( message == SHUTDOWN_MSG ) {
+	  DLOG(INFO) << "setting shutdown flag";
+	  *shutdown_ = true;
+	  break;
+	}
       }
+    } catch( const util::queue_interrupt& ) {
+      LOG(INFO) << "Caught interrupt" ;
+    } catch( const std::exception& ex ) {
+      LOG(ERROR) << "Exception terminated thread " << ex.what() ;
     }
 
-    zmq_close( socket );
+    close_socket( socket );
 
   }
 

@@ -1,6 +1,8 @@
 #include "context.hpp"
 #include "heartbeat_sender.hpp"
 #include "heartbeat_receiver.hpp"
+#include "kibitz_util.hpp"
+
 namespace kibitz {
 
 
@@ -31,7 +33,7 @@ namespace kibitz {
   void context::send_internal_message( const char* message ) {
     string s( message );
     DLOG(INFO) << "sending internal message -> " << message;
-    send( message_bus_socket_, s ); 
+    kibitz::util::send( message_bus_socket_, s ); 
   }
 
   void context::set_worker_type( const string& worker_type_name ) {

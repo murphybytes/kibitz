@@ -45,6 +45,7 @@ namespace kibitz {
       ( "discovery-binding,d", po::value<string>(), "zmq epgm multicast binding for recieving locator information" )
       ( "tcp-port,p", po::value<int>()->default_value(8999), "Port for tcp based zmq messages" )
       ( "context-threads,t", po::value< int >()->default_value( 1 ), "Thread count passed to zmq_init" )
+      ( "heartbeat-frequency,h", po::value< int >()->default_value( 1000 ), "Heartbeat frequency in milliseconds" )
       ;
     po::variables_map command_line;
     po::store( po::parse_command_line( argc, argv, options ), command_line );
