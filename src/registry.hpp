@@ -14,9 +14,9 @@ using std::string;
 
 
 class registry {
-
-  typedef std::set< kibitz::heartbeat > worker_set_t;
-  typedef std::map< string, worker_set_t > worker_map_t;
+  typedef boost::shared_ptr<kibitz::heartbeat> heartbeat_ptr_t;
+  typedef std::map< int, heartbeat_ptr_t > worker_map_t;
+  typedef std::map< string, worker_map_t > worker_type_map_t;
 
 
   void* publisher_socket_;

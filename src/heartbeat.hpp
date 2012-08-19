@@ -19,7 +19,7 @@ namespace kibitz {
     heartbeat( const ptree& json );
     virtual ~heartbeat() ;
     virtual string to_json() const ;
-    bool operator<(const heartbeat& comp ) const ;
+  
     const string& worker_type() const ;
     const int& worker_id() const ;
     void increment_tick_count();

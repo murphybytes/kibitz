@@ -23,6 +23,8 @@
 #include <boost/asio.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 
 #include <time.h>
 
@@ -36,6 +38,8 @@ using boost::format;
 using boost::shared_ptr;
 using boost::thread_group;
 using boost::property_tree::ptree; 
+
+using namespace boost::posix_time;
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem3;

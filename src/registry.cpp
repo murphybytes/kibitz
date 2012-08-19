@@ -37,7 +37,7 @@ void registry::push_message( const kibitz::message& message ) {
 void registry::operator()() {
   
   DLOG(INFO) << "starting registry thread";
-  worker_map_t workers;
+  worker_type_map_t workers;
   timeval last_send = { 0, 0 };
 
   try {
@@ -66,26 +66,22 @@ void registry::operator()() {
 
       if( dynamic_pointer_cast<kibitz::notification_message>(message_ptr)->message_type() == "heartbeat" ) {
 	DLOG(INFO) << "Sender thread got heartbeat" ;
-	kibitz::heartbeat hb = *dynamic_pointer_cast<kibitz::heartbeat>(message_ptr); 
-	if( workers.find( hb.worker_type() ) == workers.end() ) {
-	  worker_set_t workers_by_type;
-	  workers_by_type.insert( hb );
-	  workers[ hb.worker_type() ] = workers_by_type; 
-	} else {
-	  workers[ hb.worker_type() ].insert( hb );
-	}
+	heartbeat_ptr_t heartbeat_ptr = dynamic_pointer_cast<kibitz::heartbeat>(message_ptr);
+	workers[heartbeat_ptr->worker_type()][heartbeat_ptr->worker_id()] = heartbeat_ptr;
+
 	
 	if( one_second_elapsed( last_send ) ) {
 	  DLOG(INFO) << "Sending locator information for " << workers.size() << " workers";
-	  for( worker_map_t::iterator worker_type = workers.begin(); worker_type != workers.end(); ++worker_type ) {
+	  for( worker_type_map_t::iterator worker_type = workers.begin(); worker_type != workers.end(); ++worker_type ) {
 	    DLOG(INFO) << "Sending Message for worker type " << worker_type->first ;
-	    for( worker_set_t::iterator worker = worker_type->second.begin(); worker != worker_type->second.end(); ++worker ) {
-	      DLOG(INFO) << "Sending worker type " << worker_type->first << " worker id " << worker->worker_id() ;
-	      kibitz::util::send( publisher_socket_, worker->to_json() );	      
+	    for( worker_map_t::iterator worker = worker_type->second.begin(); worker != worker_type->second.end(); ++worker ) {
+	      DLOG(INFO) << "Sending worker type " << worker_type->first << " worker id " << worker->first ;
+	      kibitz::util::send( publisher_socket_, worker->second->to_json() );	      
 	    }
 	  }
 
 	}
+	
 	
       }
     }

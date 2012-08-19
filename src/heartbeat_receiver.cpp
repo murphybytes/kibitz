@@ -1,4 +1,5 @@
 #include "heartbeat_receiver.hpp"
+#include "kibitz_util.hpp"
 
 namespace kibitz {
 
@@ -42,7 +43,7 @@ namespace kibitz {
     while( !shutdown() ) {
       DLOG(INFO) << "Waiting for heartbeat";
       string msg ;
-      recv( socket, msg );
+      kibitz::util::recv( socket, msg );
       DLOG(INFO) << "Received heartbeat" << msg;      
     }
 

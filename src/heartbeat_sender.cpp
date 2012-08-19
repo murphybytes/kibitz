@@ -1,5 +1,6 @@
 #include "heartbeat.hpp"
 #include "heartbeat_sender.hpp"
+#include "kibitz_util.hpp"
 
 
 namespace kibitz {
@@ -31,10 +32,15 @@ namespace kibitz {
     }
 
     heartbeat beater( context_->get_config() );
+    boost::condition_variable condition;
+    boost::mutex mutex;
+    boost::unique_lock<boost::mutex> lock( mutex );
+    time_duration duration = millisec( 1000 );
 
     while(!shutdown()) {
+      condition.timed_wait( lock, duration ); 
       // TODO: heartbeat freq configurable
-      sleep( 5 );
+      //sleep( 5 );
       beater.increment_tick_count() ;
       DLOG(INFO) << "Generated heartbeat"; 
       send( socket, beater.to_json() );
