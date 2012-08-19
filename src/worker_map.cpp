@@ -45,6 +45,8 @@ namespace kibitz {
   void worker_map::handle_worker_notification( message_ptr message, worker_map_t& workers )  {
     DLOG(INFO) << "handling worker notification" ;
     worker_notification_message_ptr_t worker = dynamic_pointer_cast<worker_notification_message>(message);
+    // TODO timestamp when worker was placed into this map 
+    // so we can deal with dead workers that don't heartbeat
     workers[worker->worker_type()][worker->worker_id()] = worker;
   }
 
