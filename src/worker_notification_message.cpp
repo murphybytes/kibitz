@@ -4,23 +4,23 @@
 namespace kibitz {
 
   worker_notification_message::worker_notification_message( const ptree& json )  
-    :notification_message( "worker_query" ),
+    :notification_message( "worker_notification" ),
      worker_type_( json.get<string>("worker_type")),
      worker_id_( json.get<int32_t>("worker_id")),
      host_name_( json.get<string>("host_name")),
      port_( json.get<int16_t>("port") ) {
   }
 
-  worker_notification_message::worker_notification_message( const heartbeat& hb ) 
-    :notification_message( "worker_query"), 
-     worker_type_( hb.worker_type_ ), 
-     worker_id_( hb.worker_id_ ),
-     host_name_(hb.host_name_ ),
-     port_( hb.port_ ) {
+  worker_notification_message::worker_notification_message( heartbeat_ptr_t hb ) 
+    :notification_message( "worker_notification"), 
+     worker_type_( hb->worker_type_ ), 
+     worker_id_( hb->worker_id_ ),
+     host_name_(hb->host_name_ ),
+     port_( hb->port_ ) {
   }
 
   worker_notification_message::worker_notification_message( const string& worker_type ) 
-    :notification_message( "worker_query"),
+    :notification_message( "worker_notification"),
      worker_type_(worker_type),
      worker_id_( WORKER_ID_UNASSIGNED ),
      port_( PORT_UNASSIGNED ) {
@@ -51,7 +51,7 @@ namespace kibitz {
     tree.put( "host_name", host_name_ );
     tree.put( "port", port_ );
     boost::property_tree::json_parser::write_json( stm, tree );
-    stm.str();
+    return stm.str();
   }
     
 

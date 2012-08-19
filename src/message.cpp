@@ -1,5 +1,6 @@
 #include "heartbeat.hpp"
 #include "inproc_notification_message.hpp"
+#include "worker_notification_message.hpp"
 
 namespace kibitz {
 
@@ -13,6 +14,10 @@ namespace kibitz {
 
     if( notification_type == "inproc" ) {
       result = message_ptr( new inproc_notification_message( tree ) );
+    }
+    
+    if( notification_type == "worker_notification" ) {
+      result = message_ptr( new worker_notification_message( tree ) );
     }
 
     return result;

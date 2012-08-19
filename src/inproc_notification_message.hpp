@@ -17,6 +17,8 @@ namespace kibitz {
     virtual string to_json() const ;
     int get_notification() const { return notification_; }
   };
+
+  typedef shared_ptr<inproc_notification_message> inproc_notification_ptr_t;
 }
 
 #endif

@@ -18,6 +18,7 @@ add_library( kibitz SHARED
   common.cpp
   heartbeat_receiver.cpp
   kibitz_util.cpp
+  worker_map.cpp
 )
 
 add_library( locator SHARED

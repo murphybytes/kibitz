@@ -15,7 +15,7 @@ namespace kibitz {
 
   public:
     worker_notification_message( const ptree& json ) ;
-    worker_notification_message( const heartbeat& hb );
+    worker_notification_message( heartbeat_ptr_t hb );
     worker_notification_message( const string& worker_type );
     virtual ~worker_notification_message() {}
     const string& worker_type() const ;
@@ -26,6 +26,8 @@ namespace kibitz {
 
     
   };
+
+  typedef shared_ptr<worker_notification_message> worker_notification_message_ptr_t;
 
 }
 #endif

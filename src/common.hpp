@@ -38,6 +38,7 @@ using boost::format;
 using boost::shared_ptr;
 using boost::thread_group;
 using boost::property_tree::ptree; 
+using boost::dynamic_pointer_cast;
 using namespace boost::posix_time;
 
 namespace po = boost::program_options;
@@ -49,6 +50,7 @@ using namespace google;
 // misc helper functions
 namespace kibitz {
 
+  static const char* WORKER_MANAGER_BINDING = "inproc://worker_manager";
 
   // declared in kibitz.cpp
   class context;

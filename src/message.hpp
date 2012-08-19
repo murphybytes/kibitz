@@ -35,6 +35,7 @@ namespace kibitz {
 
     virtual ~message() {}
     static const int stop = 0;
+    static const int ok = 0;
     virtual string to_json() const = 0;
     const string& message_type() const { return message_type_; }
   };

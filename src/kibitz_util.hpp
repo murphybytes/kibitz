@@ -1,9 +1,11 @@
-
+#ifndef kibitz_util_hpp
+#define kibitz_util_hpp
 
 #include <zmq.h>
 #include <string>
 #include <stdexcept>
 #include <sstream>
+
 
 using std::string;
 using std::stringstream;
@@ -25,3 +27,5 @@ namespace kibitz {
     void close_socket( void* socket );
   }
 }
+
+#endif

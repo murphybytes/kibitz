@@ -29,6 +29,8 @@ namespace kibitz {
     //virtual message_type_t message_type() const { return heartbeat; }
   };
 
+  typedef shared_ptr<heartbeat> heartbeat_ptr_t;
+
 }
 
 
