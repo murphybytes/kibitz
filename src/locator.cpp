@@ -15,6 +15,9 @@ using namespace google;
 using std::string;
 namespace po = boost::program_options;
 
+using kibitz::util::create_socket;
+using kibitz::util::check_zmq;
+using kibitz::util::close_socket;
 
 int main( int argc, char* argv[] ) {
 
@@ -45,32 +48,29 @@ int main( int argc, char* argv[] ) {
   }
 
   void* context = zmq_init( command_line["context-threads"].as<int>() );
-  
-  if( context ) {
-    void* insocket = zmq_socket( context, ZMQ_PULL );
-    
-    if( !insocket ) {
-      LOG(ERROR) << "Could not create inbound socket. Error  " << zmq_errno();
-      exit( 1 );
-    }
+  void* inproc_pub_socket = NULL;
+  void* inproc_sub_socket = NULL;
+  void* outsocket = NULL;
+  void* insocket = NULL;
 
-    rc = zmq_bind( insocket, in_binding );
+  if( !context ) {
+    LOG(ERROR) << "Could not create zmq context " << zmq_errno();
+    return 1;
+  }
 
-    if( rc ) {
-      LOG(ERROR) << "Could not connect to heartbeat broadcast " << in_binding << " " << zmq_errno() ;
-      exit( 1 );
-    }
+  try {
 
-    void* inproc_pub_socket = zmq_socket( context, ZMQ_PUB );
-    rc = zmq_bind( inproc_pub_socket, "inproc://x" );
-    void* inproc_sub_socket = zmq_socket( context, ZMQ_SUB );
-    rc = zmq_connect( inproc_sub_socket, "inproc://x" );
-    rc = zmq_setsockopt( inproc_sub_socket, ZMQ_SUBSCRIBE, "", 0 );
-
-    void* outsocket = zmq_socket( context, ZMQ_PUB );
+    insocket = create_socket(  context, ZMQ_PULL );
+    check_zmq( zmq_bind( insocket, in_binding ) );
+    inproc_pub_socket = create_socket(  context, ZMQ_PUB );
+    check_zmq( zmq_bind( inproc_pub_socket, "inproc://x" ) );
+    inproc_sub_socket = create_socket( context, ZMQ_SUB );
+    check_zmq( zmq_connect( inproc_sub_socket, "inproc://x" ) );
+    check_zmq( zmq_setsockopt( inproc_sub_socket, ZMQ_SUBSCRIBE, "", 0 ) );
+    outsocket = create_socket( context, ZMQ_PUB );
     string pub_binding = (format( "tcp://*:%1%" ) % command_line["port"].as<int>()).str();
     LOG(INFO) << "Locator will publish on " << pub_binding;
-    rc = zmq_bind( outsocket, pub_binding.c_str() );
+    check_zmq( zmq_bind( outsocket, pub_binding.c_str() ) );
 
     registry reg(  inproc_pub_socket, inproc_sub_socket, outsocket );
     boost::thread sender_thread( reg );
@@ -81,11 +81,8 @@ int main( int argc, char* argv[] ) {
 	kibitz::util::recv( insocket, message );
 	if( !message.empty() ) {
 	  DLOG(INFO) << "got message -> " << message ;
-	  //	send( outsocket, message );
 	  reg.push_message(  message  );
-	
 	}
-      
       }
     } catch( const kibitz::util::queue_interrupt& ) {
       LOG(INFO) << "Caught signal shutting down" ;
@@ -98,9 +95,17 @@ int main( int argc, char* argv[] ) {
     reg.push_message( inproc_notification_message );
     sender_thread.join();
 
-    zmq_close( insocket ) ;
-    zmq_term( context );
+  } catch( const std::exception& ex ) {
+    exit_code = 1;
+    LOG(ERROR) << "An exception killed worker locator " << ex.what() ;
   }
+
+  close_socket( inproc_pub_socket );
+  close_socket( inproc_sub_socket );
+  close_socket( outsocket );
+  close_socket( insocket ) ;
+  zmq_term( context );
+  
 
   
 

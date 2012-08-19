@@ -19,5 +19,8 @@ namespace kibitz {
 
     void recv( void* socket, string& message ) ;
     void send( void* socket, const string& message );
+    void check_zmq( int zmq_return_code ) ;
+    void* create_socket( void* context, int socktype ) ;
+    void close_socket( void* socket );
   }
 }

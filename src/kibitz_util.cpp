@@ -12,6 +12,30 @@ namespace kibitz {
     queue_interrupt::~queue_interrupt() throw() {
     }
 
+    void close_socket( void* socket ) {
+      if( socket ) {
+	zmq_close( socket );
+      }
+    }
+
+    void* create_socket( void* context, int socktype ) {
+      void* result = zmq_socket( context, socktype ) ;
+      if( !result ) {
+	stringstream stm;
+	stm << "zmq_socket failed with " << zmq_errno(); 
+	throw std::runtime_error( stm.str() );
+      }
+      return result;
+    }
+
+    void check_zmq( int return_code ) {
+      if( return_code ) {
+	stringstream stm;
+	stm << "zmq call failed with error code " << zmq_errno() ;
+	throw std::runtime_error( stm.str() );
+      }
+    }
+
     void send( void* socket, const string& message ) {
       zmq_msg_t msg;
       zmq_msg_init_size( &msg, message.length() );
