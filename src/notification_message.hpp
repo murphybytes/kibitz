@@ -8,14 +8,21 @@
 namespace kibitz {
 
   class notification_message : public message {
-    const string message_type_;
+    const string notification_type_;
+    const string version_;
   protected:
-    notification_message(const string& message_type) 
+    notification_message(const string& notification_type, const string& version = "1.0") 
       :message("notification"),
-       message_type_(message_type) {}
+       version_( version ),
+       notification_type_(notification_type) {}
+    void populate_header( ptree& tree ) const {
+      message::populate_header( tree );
+      tree.put( "notification_type", notification_type_ );
+      tree.put( "version", version_ );
+    }
   public :
     virtual string to_json() const = 0;
-    const string& message_type() const { return message_type_ ; }
+    const string& notification_type() const { return notification_type_ ; }
   };
 
 }

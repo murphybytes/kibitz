@@ -3,7 +3,7 @@
 
 #include "heartbeat.hpp"
 #include <boost/asio/ip/host_name.hpp>
-
+#include "worker_notification_message.hpp"
 namespace kibitz {
 
 
@@ -44,8 +44,7 @@ namespace kibitz {
 
     stringstream stm;
     ptree tree;
-    tree.put( "message_type", "notification" );
-    tree.put( "notification_type", "heartbeat" );
+    notification_message::populate_header( tree );
     tree.put( "worker_type", worker_type_ );
     tree.put( "worker_id", worker_id_ );
     tree.put( "host", host_name_ );

@@ -7,6 +7,8 @@
 
 namespace kibitz {
 
+  class worker_notification_message;
+
   class heartbeat : public notification_message {
     string worker_type_;
     int worker_id_;
@@ -14,6 +16,7 @@ namespace kibitz {
     int pid_;
     int port_;
     int ticks_;
+    friend class worker_notification_message;
   public :
     heartbeat(const boost::program_options::variables_map& config) ;
     heartbeat( const ptree& json );

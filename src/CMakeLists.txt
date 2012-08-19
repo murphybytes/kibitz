@@ -6,6 +6,7 @@ add_library( kibitz_messages SHARED
   heartbeat.cpp
   message.cpp
   inproc_notification_message.cpp
+  worker_notification_message.cpp
 )
 
 

@@ -46,7 +46,7 @@ void registry::operator()() {
       kibitz::util::recv( inproc_sub_socket_, message ) ;
       DLOG(INFO) << "Registry got a message " << message ;
       kibitz::message_ptr message_ptr = kibitz::message_factory( message );
-      assert( message_ptr->message_class() == "notification" );
+      assert( message_ptr->message_type() == "notification" );
       if( dynamic_pointer_cast<kibitz::notification_message>(message_ptr)->message_type() == "inproc" ) {
 	int notification = dynamic_pointer_cast<kibitz::inproc_notification_message>(message_ptr)->get_notification() ;
 	bool exit_thread = false;
@@ -64,7 +64,7 @@ void registry::operator()() {
 	}
       }
 
-      if( dynamic_pointer_cast<kibitz::notification_message>(message_ptr)->message_type() == "heartbeat" ) {
+      if( dynamic_pointer_cast<kibitz::notification_message>(message_ptr)->notification_type() == "heartbeat" ) {
 	DLOG(INFO) << "Sender thread got heartbeat" ;
 	heartbeat_ptr_t heartbeat_ptr = dynamic_pointer_cast<kibitz::heartbeat>(message_ptr);
 	workers[heartbeat_ptr->worker_type()][heartbeat_ptr->worker_id()] = heartbeat_ptr;
