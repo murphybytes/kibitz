@@ -1,4 +1,4 @@
 #!/bin/bash
 
 
-GLOG_logtostderr=1 ./test-worker-a -I2 -Ttest_worker_a -b'tcp://localhost:5556' -d'tcp://localhost:5557'
+GLOG_logtostderr=1 ./test-worker-a -I2 -Ttest_worker_a -b'tcp://localhost:5556' -d'tcp://localhost:5557' -p9000

@@ -26,6 +26,7 @@ add_library( locator SHARED
 
 target_link_libraries( kibitz_messages 
   boost_program_options-mt
+  boost_system-mt
 )
 
 target_link_libraries( kibitz

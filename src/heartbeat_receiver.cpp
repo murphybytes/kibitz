@@ -17,7 +17,7 @@ namespace kibitz {
   void heartbeat_receiver::operator()() {
     DLOG(INFO) << "Entered heartbeat receiver thread.";
     
-    //boost::thread message_bus_listener( boost::bind( &message_base::internal_command_handler, this ));
+    boost::thread message_bus_listener( boost::bind( &message_base::internal_command_handler, this ));
 
     void* socket = NULL;
 
@@ -31,6 +31,8 @@ namespace kibitz {
       while( true ) {
 	DLOG(INFO) << "Waiting for heartbeat";
 	string msg ;
+	// TODO if we dont receive a heartbeat after a certain amount of time
+	// try to connect to alternative locator
 	kibitz::util::recv( socket, msg );
 	DLOG(INFO) << "Received heartbeat" << msg;      
       }

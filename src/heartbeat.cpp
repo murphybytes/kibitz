@@ -2,7 +2,7 @@
 #define heartbeat_hpp
 
 #include "heartbeat.hpp"
-
+#include <boost/asio/ip/host_name.hpp>
 
 namespace kibitz {
 
@@ -12,7 +12,7 @@ namespace kibitz {
     :notification_message( "heartbeat" ),
      worker_type_( config["worker-type"].as<string>()  ),
      worker_id_( config["worker-id"].as<int>() ),
-     host_name_( "xxxx" ),
+     host_name_( boost::asio::ip::host_name() ),
      pid_(getpid()),
      port_( config["tcp-port"].as<int>()),
      ticks_(0) {

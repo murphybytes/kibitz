@@ -38,7 +38,6 @@ using boost::format;
 using boost::shared_ptr;
 using boost::thread_group;
 using boost::property_tree::ptree; 
-
 using namespace boost::posix_time;
 
 namespace po = boost::program_options;

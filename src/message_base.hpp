@@ -13,10 +13,6 @@ namespace kibitz {
   protected:
     bool* shutdown_;
     context* context_;
-
-
-    
-
   
   public:
     message_base( context* context ) ;
