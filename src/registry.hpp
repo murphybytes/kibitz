@@ -12,7 +12,10 @@
 
 using std::string;
 
-
+/**
+ *  This object aggregates heartbeats from workers and rebroadcasts
+ *  discovery information to other workers.
+ */
 class registry {
   typedef boost::shared_ptr<kibitz::heartbeat> heartbeat_ptr_t;
   typedef std::map< int, heartbeat_ptr_t > worker_map_t;
@@ -31,6 +34,9 @@ public:
   virtual ~registry() ;
   void push_message( const string& msg ) ;
   void push_message( const kibitz::message& message );
+  /**
+   *  Thread function
+   */
   void operator() () ;
 
 

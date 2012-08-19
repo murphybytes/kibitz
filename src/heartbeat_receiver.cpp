@@ -1,6 +1,9 @@
 #include "heartbeat_receiver.hpp"
 #include "kibitz_util.hpp"
 
+using kibitz::util::create_socket;
+using kibitz::util::check_zmq;
+
 namespace kibitz {
 
 
@@ -14,37 +17,27 @@ namespace kibitz {
   void heartbeat_receiver::operator()() {
     DLOG(INFO) << "Entered heartbeat receiver thread.";
     
-    boost::thread message_bus_listener( boost::bind( &message_base::internal_command_handler, this ));
+    //boost::thread message_bus_listener( boost::bind( &message_base::internal_command_handler, this ));
 
-    void* socket = zmq_socket( context_->zmq_context(), ZMQ_SUB );
+    void* socket = NULL;
 
-    if( !socket ) {
-      LOG(ERROR) << "Unable to create heartbeat receiver";
-      return;
-    }
-    
+    try {
+      socket = create_socket( context_->zmq_context(), ZMQ_SUB );
+      const char* binding = context_->get_config()["discovery-binding"].as<string>().c_str() ;
+      LOG(INFO) << "Will subscribe to messages from locator on " << binding;
+      check_zmq( zmq_connect( socket, binding ) );
+      check_zmq(zmq_setsockopt( socket, ZMQ_SUBSCRIBE, "", 0));
 
-    const char* binding = context_->get_config()["discovery-binding"].as<string>().c_str() ;
-    LOG(INFO) << "Will subscribe to messages from locator on " << binding;
-    int rc = zmq_connect( socket, binding );
-
-    if( rc ) {
-      LOG(ERROR) << "heartbeat receiver failed to connect to binding " << binding ;
-      return;
-    }
-
-    rc = zmq_setsockopt( socket, ZMQ_SUBSCRIBE, "", 0);
-
-    if( rc ) {
-      LOG(ERROR) << "Attempt to set socket options failed. " ;
-      return;
-    }
-
-    while( !shutdown() ) {
-      DLOG(INFO) << "Waiting for heartbeat";
-      string msg ;
-      kibitz::util::recv( socket, msg );
-      DLOG(INFO) << "Received heartbeat" << msg;      
+      while( true ) {
+	DLOG(INFO) << "Waiting for heartbeat";
+	string msg ;
+	kibitz::util::recv( socket, msg );
+	DLOG(INFO) << "Received heartbeat" << msg;      
+      }
+    } catch( const util::queue_interrupt& ) {
+      LOG(INFO) << "Received interrupt shutting down heartbeat receiver thread";
+    } catch( const std::exception& ex ) {
+      LOG(ERROR) << "Exception caused thread to terminate " << ex.what() ;
     }
 
     

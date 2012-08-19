@@ -9,9 +9,7 @@ namespace kibitz {
 
 
 
-  void catch_sig_int( int sig ) {
-    context_->send_internal_message( SHUTDOWN_MSG );
-  }
+
 
   
 
@@ -62,7 +60,7 @@ namespace kibitz {
     validate_command_line( command_line );
  
     context_=  new context( command_line ) ;
-    signal( SIGINT, catch_sig_int );
+
   }
 
   void start() {

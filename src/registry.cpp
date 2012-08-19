@@ -94,6 +94,8 @@ void registry::operator()() {
   
 }
 
+// TODO this method controls frequency of broadcast of 
+// locator information, we want to make it configurable
 bool registry::one_second_elapsed( timeval& last_send ) {
   bool second_elapsed = false;
   const int microsecs_in_second = 1000000;
