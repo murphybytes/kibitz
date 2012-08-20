@@ -67,9 +67,9 @@ test-worker-a - sample worker that implements the kibitz library
   -I [ --worker-id ] arg                (Required) Integer that identifies 
                                         worker. Must be unique with worker type
   -T [ --worker-type ] arg              (Required) Name of the type of worker.
-  -b [ --heartbeat-binding ] arg        zmq epgm multicast binding for 
+  -b [ --heartbeat-binding ] arg        zmq tcp binding for 
                                         publishing heartbeats
-  -d [ --discovery-binding ] arg        zmq epgm multicast binding for 
+  -d [ --discovery-binding ] arg        zmq tcp binding for 
                                         recieving locator information
   -p [ --tcp-port ] arg (=8999)         Port for tcp based zmq messages
   -t [ --context-threads ] arg (=1)     Thread count passed to zmq_init
