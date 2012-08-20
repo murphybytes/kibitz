@@ -50,7 +50,7 @@ Components
 ------------------------
 
 worker-locator - provides mechanism for workers to discover each other
-
+```
 worker-locator:
   -h [ --help ]                         Show help message
   -b [ --heartbeat-binding ] arg (=tcp://*:5556)
@@ -58,10 +58,10 @@ worker-locator:
   -p [ --port ] arg (=5557)             Port used to distribute locator 
                                         messages
   -t [ --context-threads ] arg (=1)     zmq context thread count
-
+```
 
 test-worker-a - sample worker that implements the kibitz library
-
+```
 "test-worker-a" options:
   -h [ --help ]                         Show help message
   -I [ --worker-id ] arg                (Required) Integer that identifies 
@@ -75,3 +75,4 @@ test-worker-a - sample worker that implements the kibitz library
   -t [ --context-threads ] arg (=1)     Thread count passed to zmq_init
   -h [ --heartbeat-frequency ] arg (=1000)
                                         Heartbeat frequency in milliseconds
+```
