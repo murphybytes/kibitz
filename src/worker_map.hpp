@@ -19,7 +19,7 @@ namespace kibitz {
     void* send_socket_;
     context* context_;
     worker_map( void* send_socket );
-    void handle_worker_notification( message_ptr message, worker_map_t& workers ) ;
+    void handle_worker_notification( message_ptr_t message, worker_map_t& workers ) ;
   public:
     worker_map(context* context) ;
     virtual ~worker_map();

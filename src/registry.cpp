@@ -45,7 +45,7 @@ void registry::operator()() {
       string message;
       kibitz::util::recv( inproc_sub_socket_, message ) ;
       DLOG(INFO) << "Registry got a message " << message ;
-      kibitz::message_ptr message_ptr = kibitz::message_factory( message );
+      kibitz::message_ptr_t message_ptr = kibitz::message_factory( message );
       assert( message_ptr->message_type() == "notification" );
       if( dynamic_pointer_cast<kibitz::notification_message>(message_ptr)->message_type() == "inproc" ) {
 	int notification = dynamic_pointer_cast<kibitz::inproc_notification_message>(message_ptr)->get_notification() ;

@@ -23,11 +23,14 @@ namespace kibitz {
 
   class message {
     const string message_type_;
+    const string version_;
   protected :
-    message( const string& message_type )
-      :message_type_(message_type) {}
+    message( const string& message_type, const string& version  )
+      :message_type_(message_type),
+       version_( version )  {}
     virtual void populate_header( ptree& tree ) const {
       tree.put( "message_type", message_type_ );
+      tree.put( "version", version_ );
     }
   public:
     static const int16_t PORT_UNASSIGNED = 0x7FFF;
@@ -38,12 +41,13 @@ namespace kibitz {
     static const int ok = 0;
     virtual string to_json() const = 0;
     const string& message_type() const { return message_type_; }
+    const string& version() const { return version_ ; }
   };
 
 
-  typedef shared_ptr<message> message_ptr;
+  typedef shared_ptr<message> message_ptr_t;
 
-  message_ptr message_factory( const string& json ) ;
+  message_ptr_t message_factory( const string& json ) ;
 }
 
 

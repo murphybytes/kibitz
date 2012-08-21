@@ -9,7 +9,7 @@
 #include <string>
 #include <sstream>
 #include <stdexcept>
-
+#include <vector> 
 #include <glog/logging.h>
 
 #include <unistd.h>

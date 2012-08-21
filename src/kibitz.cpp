@@ -74,6 +74,15 @@ namespace kibitz {
       context_->terminate();
     }
   }
+
+  void set_message_handler( callback fn ) {
+  }
+
+  void send_message( const collaboration_message& message ) {
+  }
+
+  void send_notification( const notification_message& message ) {
+  }
   
 
 }

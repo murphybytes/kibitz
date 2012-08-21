@@ -42,7 +42,7 @@ namespace kibitz {
        
   }
 
-  void worker_map::handle_worker_notification( message_ptr message, worker_map_t& workers )  {
+  void worker_map::handle_worker_notification( message_ptr_t message, worker_map_t& workers )  {
     DLOG(INFO) << "handling worker notification" ;
     worker_notification_message_ptr_t worker = dynamic_pointer_cast<worker_notification_message>(message);
     // TODO timestamp when worker was placed into this map 
@@ -61,7 +61,7 @@ namespace kibitz {
 	string json ;
 	util::recv( socket, json );
 	DLOG(INFO) << "worker map manager got " << json;
-	message_ptr message = message_factory( json );
+	message_ptr_t message = message_factory( json );
 	assert( message->message_type() == "notification" );
 	if( dynamic_pointer_cast<notification_message>(message)->notification_type() == "worker_notification" ){
 	  handle_worker_notification( message, worker_map );
