@@ -39,7 +39,7 @@ target_link_libraries( kibitz
   boost_thread-mt
   glog
   zmq
-  
+  yaml-cpp  
 )
 
 target_link_libraries( locator

@@ -1,7 +1,10 @@
 #include <boost/test/minimal.hpp>
 #include "common.hpp"
 #include "heartbeat.hpp"
-
+#include <fstream>
+#include <yaml-cpp/yaml.h>
+#include <vector>
+#include <iostream>
 
 int test_main( int argc, char* argv[] ) {
   
@@ -25,5 +28,24 @@ int test_main( int argc, char* argv[] ) {
   BOOST_CHECK( message != NULL );
   shared_ptr<kibitz::heartbeat> heartbeat_ptr = boost::dynamic_pointer_cast<kibitz::heartbeat>( message );
   BOOST_CHECK( heartbeat_ptr != NULL );
+
+  std::vector< string > edges;
+  string scalar;
+  std::fstream stm( "../config/test-worker-b.yaml" );
+  YAML::Parser parser( stm );
+  YAML::Node doc ;
+  parser.GetNextDocument( doc );
+  YAML::Iterator it = doc.begin(); 
+  it.first() >> scalar;
+  it.second() >> edges;
+  BOOST_CHECK( scalar == "in-edges" );
+  BOOST_CHECK( edges.size() == 1 );
+  ++it;
+  it.first() >> scalar;
+  it.second() >> edges;
+  BOOST_CHECK( scalar == "out-edges" );
+  BOOST_CHECK( edges.size() == 2 );
+
+
   return 0;
 }

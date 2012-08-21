@@ -46,6 +46,12 @@ http://code.google.com/p/google-glog/
 Mac OSX
 brew install glog
 
+yaml-cpp
+
+http://code.google.com/p/yaml-cpp/downloads/detail?name=yaml-cpp-0.3.0.tar.gz&can=2&q=
+Mac OSX
+brew install yaml-cpp
+
 Components
 ------------------------
 
