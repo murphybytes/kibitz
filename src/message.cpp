@@ -2,6 +2,7 @@
 #include "inproc_notification_message.hpp"
 #include "worker_notification_message.hpp"
 #include "worker_query_response.hpp"
+#include "worker_query.hpp"
 
 namespace kibitz {
 
@@ -23,6 +24,10 @@ namespace kibitz {
 
     if( notification_type == "worker_query_response" ) {
       result = message_ptr_t( new worker_query_response( tree ) );
+    }
+
+    if( notification_type == "worker_query" ) {
+      result = message_ptr_t( new worker_query( tree ) );
     }
 
     return result;

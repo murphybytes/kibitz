@@ -8,9 +8,10 @@
 #include <iostream>
 
 #include "worker_query_response.hpp"
+#include "worker_query.hpp"
 
 namespace k = kibitz;
-
+using boost::dynamic_pointer_cast;
 
 int test_main( int argc, char* argv[] ) {
   
@@ -61,7 +62,7 @@ int test_main( int argc, char* argv[] ) {
   json = response.to_json();
   std::cout << "worker query response " << json << std::endl;
   BOOST_CHECK( !json.empty() );
-  k::worker_query_response_ptr_t worker_query_response_ptr = boost::dynamic_pointer_cast< k::worker_query_response >( k::message_factory( json ) );
+  k::worker_query_response_ptr_t worker_query_response_ptr = dynamic_pointer_cast< k::worker_query_response >( k::message_factory( json ) );
   BOOST_CHECK( worker_query_response_ptr != NULL );
   BOOST_CHECK( response == *worker_query_response_ptr );
 
@@ -72,9 +73,17 @@ int test_main( int argc, char* argv[] ) {
   workers.push_back(worker);
   response.set_workers( workers );
   std::cout << "with two workers " << response.to_json() << std::endl;
-  worker_query_response_ptr = boost::dynamic_pointer_cast< k::worker_query_response> ( k::message_factory( response.to_json() ) );
+  worker_query_response_ptr = dynamic_pointer_cast< k::worker_query_response> ( k::message_factory( response.to_json() ) );
   BOOST_CHECK( worker_query_response_ptr != NULL );
   BOOST_CHECK( response == *worker_query_response_ptr );
+  
+  k::worker_query wq( "worker-type-a" );
+  json = wq.to_json();
+  std::cout << "worker query " << json << std::endl;
+  BOOST_CHECK( !json.empty() );
+  k::worker_query_ptr_t worker_query_ptr = dynamic_pointer_cast<k::worker_query>( k::message_factory( json ) );
+  BOOST_CHECK( worker_query_ptr != NULL );
+  BOOST_CHECK( worker_query_ptr->worker_type() == "worker-type-a" );
 
   return 0;
 }
