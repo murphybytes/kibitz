@@ -7,6 +7,11 @@
 #include <vector>
 #include <iostream>
 
+#include "worker_query_response.hpp"
+
+namespace k = kibitz;
+
+
 int test_main( int argc, char* argv[] ) {
   
   po::options_description options("test");
@@ -43,7 +48,33 @@ int test_main( int argc, char* argv[] ) {
   BOOST_CHECK( edges.size() == 2 );
   ++it;
   BOOST_CHECK( it == doc.end() );
+  
+  k::worker_infos_t workers;
+  k::worker_info worker;
+  worker.worker_type = "test-worker-a";
+  worker.worker_id = 1;
+  worker.port = 9000;
+  worker.host = "foo.com";
+  workers.push_back(worker);
+  k::worker_query_response response;
+  response.set_workers( workers );
+  json = response.to_json();
+  std::cout << "worker query response " << json << std::endl;
+  BOOST_CHECK( !json.empty() );
+  k::worker_query_response_ptr_t worker_query_response_ptr = boost::dynamic_pointer_cast< k::worker_query_response >( k::message_factory( json ) );
+  BOOST_CHECK( worker_query_response_ptr != NULL );
+  BOOST_CHECK( response == *worker_query_response_ptr );
 
+  worker.worker_type = "test-worker-a";
+  worker.worker_id = 2;
+  worker.port = 9001;
+  worker.host = "foo.com";
+  workers.push_back(worker);
+  response.set_workers( workers );
+  std::cout << "with two workers " << response.to_json() << std::endl;
+  worker_query_response_ptr = boost::dynamic_pointer_cast< k::worker_query_response> ( k::message_factory( response.to_json() ) );
+  BOOST_CHECK( worker_query_response_ptr != NULL );
+  BOOST_CHECK( response == *worker_query_response_ptr );
 
   return 0;
 }

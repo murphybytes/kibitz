@@ -7,6 +7,8 @@ add_library( kibitz_messages SHARED
   message.cpp
   inproc_notification_message.cpp
   worker_notification_message.cpp
+  worker_query.cpp
+  worker_query_response.cpp
 )
 
 

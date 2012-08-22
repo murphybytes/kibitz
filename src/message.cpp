@@ -1,6 +1,7 @@
 #include "heartbeat.hpp"
 #include "inproc_notification_message.hpp"
 #include "worker_notification_message.hpp"
+#include "worker_query_response.hpp"
 
 namespace kibitz {
 
@@ -18,6 +19,10 @@ namespace kibitz {
     
     if( notification_type == "worker_notification" ) {
       result = message_ptr_t( new worker_notification_message( tree ) );
+    }
+
+    if( notification_type == "worker_query_response" ) {
+      result = message_ptr_t( new worker_query_response( tree ) );
     }
 
     return result;
