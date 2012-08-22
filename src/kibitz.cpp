@@ -41,6 +41,7 @@ namespace kibitz {
       ( "help,h", "Show help message" )
       ( "worker-id,I", po::value< int >(), "(Required) Integer that identifies worker. Must be unique with worker type" )
       ( "worker-type,T", po::value< string >(), "(Required) Name of the type of worker." )
+      ( "configuration-file,f", po::value< string >(), "(Required) Path to configuration file containing in edges and out edges" ) 
       ( "heartbeat-binding,b", po::value<string>(), "zmq tcp binding for publishing heartbeats" )
       ( "discovery-binding,d", po::value<string>(), "zmq tcp binding for recieving locator information" )
       ( "tcp-port,p", po::value<int>()->default_value(8999), "Port for tcp based zmq messages" )

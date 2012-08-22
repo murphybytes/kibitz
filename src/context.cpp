@@ -49,13 +49,29 @@ namespace kibitz {
     heartbeat_handler_ = heartbeat_handler;
   }
 
+ 
+
   void context::start() {
     heartbeat_sender hb_sender( this );
     heartbeat_receiver hb_receiver( this );
     worker_map wmap( this );
+    //   edges_t in_edges = get_in_edges() ;
+    //edges_t out_edges = get_out_edges();
+    //out_edge_manager out_edges( this );
     threads_.create_thread( wmap );
     threads_.create_thread(hb_sender);
     threads_.create_thread(hb_receiver);
+    /*
+    for( workers::iterator worker = in_edges.begin(); worker != in_edges.end() ; ++worker ) {
+      threads_.create( in_edge( this, worker ) );
+    }
+
+    for( workers::iterator worker = out_edges.begin(); worker != out_edges.end() ; ++worker ) {
+      threads_.create( out_edge( this, worker );
+    }
+    */
+
+          
     
     threads_.join_all();
 

@@ -1,3 +1,4 @@
+
 #include <boost/test/minimal.hpp>
 #include "common.hpp"
 #include "heartbeat.hpp"
@@ -39,12 +40,9 @@ int test_main( int argc, char* argv[] ) {
   it.first() >> scalar;
   it.second() >> edges;
   BOOST_CHECK( scalar == "in-edges" );
-  BOOST_CHECK( edges.size() == 1 );
-  ++it;
-  it.first() >> scalar;
-  it.second() >> edges;
-  BOOST_CHECK( scalar == "out-edges" );
   BOOST_CHECK( edges.size() == 2 );
+  ++it;
+  BOOST_CHECK( it == doc.end() );
 
 
   return 0;
