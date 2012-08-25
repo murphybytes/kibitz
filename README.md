@@ -57,6 +57,8 @@ yaml-cpp make file thus
 ```
 cmake -DBUILD_SHARED_LIBS=ON
 
+```
+
 #### Mac OSX
 brew install yaml-cpp
 
