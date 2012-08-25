@@ -24,3 +24,6 @@ unit-test
 worker-locator
 .DS_Store
 TAGS
+
+log/*
+src/core

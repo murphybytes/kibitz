@@ -46,11 +46,20 @@ http://code.google.com/p/google-glog/
 Mac OSX
 brew install glog
 
-yaml-cpp
+### yaml-cpp
 
 http://code.google.com/p/yaml-cpp/downloads/detail?name=yaml-cpp-0.3.0.tar.gz&can=2&q=
-Mac OSX
+
+#### Linux 
+yaml-cpp builds a static lib by default. If you need a shared
+lib because your build fails in Linux use cmake to generate
+yaml-cpp make file thus
+```
+cmake -DBUILD_SHARED_LIBS=ON
+
+#### Mac OSX
 brew install yaml-cpp
+
 
 Components
 ------------------------
