@@ -6,6 +6,7 @@
 
 namespace kibitz {
 
+    typedef std::vector< string > worker_types_t;
 
   class context {
     
@@ -18,6 +19,8 @@ namespace kibitz {
     callback heartbeat_handler_;
     thread_group threads_;
 
+
+    worker_types_t get_worker_types() const;
   public:
     context( const po::variables_map& application_configuration );
     ~context();

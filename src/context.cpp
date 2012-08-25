@@ -3,6 +3,7 @@
 #include "heartbeat_receiver.hpp"
 #include "kibitz_util.hpp"
 #include "worker_map.hpp"
+#include <yaml-cpp/yaml.h>
 
 namespace kibitz {
 
@@ -49,7 +50,21 @@ namespace kibitz {
     heartbeat_handler_ = heartbeat_handler;
   }
 
- 
+  worker_types_t context::get_worker_types() const {
+    worker_types_t worker_types;
+    if( application_configuration_.count( "configuration-file" ) ) {
+      std::fstream stream( application_configuration_["configuration-file"].as<string>().c_str() );
+      YAML::Parser parser( stream );
+      YAML::Node doc;
+      parser.GetNextDocument( doc );
+      YAML::Iterator it = doc.begin();
+      it.second() >> worker_types;
+     }
+    return worker_types;
+  }
+
+  
+  
 
   void context::start() {
     heartbeat_sender hb_sender( this );
@@ -61,15 +76,17 @@ namespace kibitz {
     threads_.create_thread( wmap );
     threads_.create_thread(hb_sender);
     threads_.create_thread(hb_receiver);
-    /*
-    for( workers::iterator worker = in_edges.begin(); worker != in_edges.end() ; ++worker ) {
-      threads_.create( in_edge( this, worker ) );
+    // wait a few seconds to discover other workers
+    sleep( 5 );
+    DLOG(INFO) << ">>>>>>>>>>>>>>>> Query Edges <<<<<<<<<<<<<<<<<";
+    worker_map_ptr_t worker_map_ptr = worker_map::get_worker_map( zmq_context_ );
+    worker_types_t in_edge_types = get_worker_types();
+    BOOST_FOREACH( const string& in_edge_type, in_edge_types ) {
+      DLOG(INFO) << "Resolving workers for " << in_edge_type ;
+      worker_infos_t worker_infos = worker_map_ptr->get_in_edge_workers( in_edge_type ) ;
+      DLOG(INFO) << "Got " << worker_infos.size() << " hits";
     }
-
-    for( workers::iterator worker = out_edges.begin(); worker != out_edges.end() ; ++worker ) {
-      threads_.create( out_edge( this, worker );
-    }
-    */
+    
 
           
     
