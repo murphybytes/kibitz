@@ -1,6 +1,10 @@
 #include "heartbeat_receiver.hpp"
 #include "kibitz_util.hpp"
 #include "worker_map.hpp"
+#include "heartbeat.hpp"
+#include "worker_broadcast_message.hpp"
+#include "bus.hpp"
+
 using kibitz::util::create_socket;
 using kibitz::util::check_zmq;
 
@@ -22,6 +26,7 @@ namespace kibitz {
     void* socket = NULL;
 
     try {
+      pub broadcast_publisher( context_->zmq_context(), HEARTBEAT_RECEIVER_BROADCASTS );
       socket = create_socket( context_->zmq_context(), ZMQ_SUB );
       const char* binding = context_->get_config()["discovery-binding"].as<string>().c_str() ;
       LOG(INFO) << "Will subscribe to messages from locator on " << binding;
@@ -35,8 +40,17 @@ namespace kibitz {
 	// TODO if we dont receive a heartbeat after a certain amount of time
 	// try to connect to alternative locator
 	kibitz::util::recv( socket, json );
-	DLOG(INFO) << "Received heartbeat" << json;
-	worker_map_ptr->send_worker_notification_from_heartbeat( json );
+	DLOG(INFO) << "Received message" << json;
+	notification_message_ptr_t message_ptr = dynamic_pointer_cast<notification_message>( message_factory( json ) );
+	string notification_type = message_ptr->notification_type();
+	if( notification_type == "heartbeat" ) {
+	  worker_map_ptr->send_worker_notification_from_heartbeat( json );
+	} else if( notification_type == "worker_broadcast" ) {
+	  broadcast_publisher.send( message_ptr->to_json()  );
+	} else {
+	
+	  LOG(ERROR) << "We got a message we don't know how to handle - " << json;
+	}
 	
       }
     } catch( const util::queue_interrupt& ) {

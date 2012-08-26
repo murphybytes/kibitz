@@ -3,6 +3,7 @@
 #include "worker_notification_message.hpp"
 #include "worker_query_response.hpp"
 #include "worker_query.hpp"
+#include "worker_broadcast_message.hpp"
 
 namespace kibitz {
 
@@ -18,6 +19,10 @@ namespace kibitz {
       result = message_ptr_t( new inproc_notification_message( tree ) );
     }
     
+    if( notification_type == "worker_broadcast" ) {
+      result = message_ptr_t( new worker_broadcast_message( tree ) );
+    }
+
     if( notification_type == "worker_notification" ) {
       result = message_ptr_t( new worker_notification_message( tree ) );
     }

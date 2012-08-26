@@ -5,6 +5,7 @@
 #include <sstream>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include "worker_broadcast_message.hpp"
 using boost::property_tree::ptree;
 
 using namespace google;
@@ -47,7 +48,9 @@ void registry::operator()() {
       DLOG(INFO) << "Registry got a message " << message ;
       kibitz::message_ptr_t message_ptr = kibitz::message_factory( message );
       assert( message_ptr->message_type() == "notification" );
-      if( dynamic_pointer_cast<kibitz::notification_message>(message_ptr)->message_type() == "inproc" ) {
+      string notification_type = dynamic_pointer_cast<kibitz::notification_message>(message_ptr)->notification_type();
+      
+      if( notification_type == "inproc" ) {
 	int notification = dynamic_pointer_cast<kibitz::inproc_notification_message>(message_ptr)->get_notification() ;
 	bool exit_thread = false;
 	switch( notification ) {
@@ -64,8 +67,14 @@ void registry::operator()() {
 	}
       }
 
-      if( dynamic_pointer_cast<kibitz::notification_message>(message_ptr)->notification_type() == "heartbeat" ) {
-	DLOG(INFO) << "Sender thread got heartbeat" ;
+      if( notification_type == "worker_broadcast" ) {
+	
+	kibitz::worker_broadcast_message_ptr_t broadcast_ptr = dynamic_pointer_cast<kibitz::worker_broadcast_message>( message_ptr );
+	LOG(INFO) << "Publishing " << broadcast_ptr->notification() << " to all workers";
+	kibitz::util::send( publisher_socket_, broadcast_ptr->to_json() );
+      }
+
+      if( notification_type == "heartbeat" ) {
 	heartbeat_ptr_t heartbeat_ptr = dynamic_pointer_cast<kibitz::heartbeat>(message_ptr);
 	workers[heartbeat_ptr->worker_type()][heartbeat_ptr->worker_id()] = heartbeat_ptr;
 

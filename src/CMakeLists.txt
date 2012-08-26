@@ -9,6 +9,7 @@ add_library( kibitz_messages SHARED
   worker_notification_message.cpp
   worker_query.cpp
   worker_query_response.cpp
+  worker_broadcast_message.cpp
 )
 
 
@@ -21,6 +22,7 @@ add_library( kibitz SHARED
   heartbeat_receiver.cpp
   kibitz_util.cpp
   worker_map.cpp
+  bus.cpp
 )
 
 add_library( locator SHARED

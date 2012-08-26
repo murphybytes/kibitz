@@ -46,11 +46,13 @@ namespace fs = boost::filesystem3;
 namespace pt = boost::property_tree;
 
 using namespace google;
+#include "bindings.hpp"
+
 
 // misc helper functions
 namespace kibitz {
 
-  static const char* WORKER_MANAGER_BINDING = "inproc://worker_manager";
+
 
   // declared in kibitz.cpp
   class context;
