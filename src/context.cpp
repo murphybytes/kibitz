@@ -4,14 +4,15 @@
 #include "kibitz_util.hpp"
 #include "worker_map.hpp"
 #include <yaml-cpp/yaml.h>
-
+#include "in_edge_manager.hpp"
 namespace kibitz {
 
 
   context::context( const po::variables_map& application_configuration )
     :application_configuration_(application_configuration),
      zmq_context_(NULL),
-     signalled_(false)  {
+     signalled_(false),
+     inedge_message_handler_(NULL)  {
     DLOG(INFO) << "ctor for context entered" ;
     zmq_context_ = zmq_init( application_configuration["context-threads"].as<int>() );
     DLOG(INFO) << "zmq initialized";
@@ -26,6 +27,14 @@ namespace kibitz {
   }
 
   context::~context() {
+  }
+
+  void context::register_inedge_message_handler( callback inedge_message_handler ) {
+    inedge_message_handler_ = inedge_message_handler;
+  }
+
+  callback context::get_inedge_message_handler() {
+    return inedge_message_handler_;
   }
 
   const po::variables_map& context::get_config() const {
@@ -70,12 +79,17 @@ namespace kibitz {
     heartbeat_sender hb_sender( this );
     heartbeat_receiver hb_receiver( this );
     worker_map wmap( this );
+    kibitz::in_edge_manager in_edge_manager( *this ); 
     //   edges_t in_edges = get_in_edges() ;
     //edges_t out_edges = get_out_edges();
     //out_edge_manager out_edges( this );
-    threads_.create_thread( wmap );
-    threads_.create_thread(hb_sender);
-    threads_.create_thread(hb_receiver);
+    {
+      boost::mutex::scoped_lock lock( mutex_ );
+      threads_.create_thread( wmap );
+      threads_.create_thread(hb_sender);
+      threads_.create_thread(hb_receiver);
+      threads_.create_thread(in_edge_manager);
+    }
     // wait a few seconds to discover other workers
     sleep( 5 );
     DLOG(INFO) << ">>>>>>>>>>>>>>>> Query Edges <<<<<<<<<<<<<<<<<";
@@ -87,12 +101,11 @@ namespace kibitz {
       DLOG(INFO) << "Got " << worker_infos.size() << " hits";
     }
     
-
-          
-    
     threads_.join_all();
 
   }
+
+  
 
   void context::stop() {
   }

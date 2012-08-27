@@ -1,5 +1,5 @@
 #!/bin/bash
 
 
-GLOG_logtostderr=1 ./test-worker-a -I1 -Ttest_worker_b -b'tcp://localhost:5556' -d'tcp://localhost:5557' -f../config/test-worker-b.yaml
+GLOG_log_dir=log ./src/test-worker-a -I1 -Ttest_worker_b -b'tcp://localhost:5556' -d'tcp://localhost:5557' -f./config/test-worker-b.yaml
 

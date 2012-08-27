@@ -23,6 +23,7 @@ add_library( kibitz SHARED
   kibitz_util.cpp
   worker_map.cpp
   bus.cpp
+  in_edge_manager.cpp
 )
 
 add_library( locator SHARED
