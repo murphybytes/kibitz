@@ -3,6 +3,7 @@
 #include "kibitz_util.hpp"
 #include "context.hpp"
 #include "worker_broadcast_message.hpp"
+#include "basic_collaboration_message.hpp"
 #include "worker_map.hpp"
 
 namespace kibitz {
@@ -86,13 +87,43 @@ namespace kibitz {
 
   }
 
+
+  bool in_edge_manager::all_messages_arrived( const string& job_id, collaboration_context_t& collab_context ) const {
+    return collab_context.job_messages[job_id].size() >= (collab_context.count_items - 1);
+    
+      }
+
   void in_edge_manager::handle_collaboration_message( collaboration_context_t& context ) {
     for( int item = 1; item < context.count_items; ++item ) {
       if( ( context.pollitems[item].revents | ZMQ_POLLIN ) == ZMQ_POLLIN ) {
 	string json ;
 	util::recv( context.pollitems[item].socket, json );
 	LOG(INFO) << "Got collaboration message -> " << json ;
+        collaboration_message_ptr_t collab_message = dynamic_pointer_cast<collaboration_message>( message_factory( json ) );
+
+	if( collab_message == NULL ) {
+	  LOG(WARNING) << "don't know how to handle collaboration message " << json;
+	  return;
+	}
 	
+	string collaboration_type = collab_message->collaboration_type();
+
+	if( collaboration_type == "generic" ) {
+	  basic_collaboration_message_ptr_t basic_collaboration = dynamic_pointer_cast<basic_collaboration_message>( collab_message) ;
+	  string job_id = basic_collaboration->job_id() ;
+	  context.job_messages[job_id].push_back( basic_collaboration->payload() );
+	  if( all_messages_arrived( job_id, context ) ) {
+	    callback cbfn = context_.get_inedge_message_handler();
+	    if( cbfn ) {
+	      cbfn( job_id, context.job_messages[job_id] );
+	    } else {
+	      LOG(WARNING) << "Got callaboration messages, no callback defined to handle messages";
+	    }
+	    context.job_messages.erase( job_id );
+	  }
+	} else {
+	  LOG(WARNING) << "don't know how to handle collaboration type " << collaboration_type;
+	}
       }
     }
   }
@@ -124,11 +155,16 @@ namespace kibitz {
       pollitems[0].events = ZMQ_POLLIN;
       pollitems[0].revents = 0;
 
+      collaboration_context_t collab_context;
+      
+
       while( true ) {
 	int rc = zmq_poll( pollitems, count_items, -1 ); 
 	if( rc > 0 ) {
 	  handle_notification_message( &pollitems, count_items, size_items );
-	  //handle_collaboration_messages( 
+	  collab_context.count_items = count_items;
+	  collab_context.pollitems = pollitems;
+	  handle_collaboration_message( collab_context );
 	}
 
       }

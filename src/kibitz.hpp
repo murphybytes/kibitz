@@ -7,7 +7,7 @@
 
 
 namespace kibitz {
-  typedef std::vector< collaboration_message_ptr_t > collaboration_messages_t;
+  typedef std::vector< string > collaboration_messages_t;
   typedef void ( *callback )( const string& job_id, const collaboration_messages_t& messages  );
 
   void initialize( int argc, char* argv[] ) ; 

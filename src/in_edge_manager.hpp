@@ -19,6 +19,7 @@ namespace kibitz {
     void release_bindings( zmq_pollitem_t* pollitems, int count_items ) ;
     void handle_notification_message( zmq_pollitem_t** pollitems, int& count_items, int& size_items );
     void handle_collaboration_message( collaboration_context_t& context );
+    bool all_messages_arrived( const string& job_id, collaboration_context_t& collab_context ) const;
   public:
     in_edge_manager( context& ctx );
     virtual ~in_edge_manager() ;
