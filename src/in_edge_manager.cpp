@@ -28,9 +28,11 @@ namespace kibitz {
     DLOG(INFO) << "Total in edges = " << all_infos.size() ;
     if( size_items < (all_infos.size() + 1) ) {
       size_items = all_infos.size() + 1;
-      *pollitems = (zmq_pollitem_t*)realloc( *pollitems, size_items );
+      *pollitems = (zmq_pollitem_t*)realloc( *pollitems, size_items * sizeof(zmq_pollitem_t) );
     }
 
+    // create bindings for all in edges, in edges
+    // start at index 1, index 0 is broadcast notifications
     count_items = all_infos.size() + 1;
     int current = 1;
     BOOST_FOREACH( const worker_info& info, all_infos ) {
@@ -60,6 +62,40 @@ namespace kibitz {
     }
   }
 
+  void in_edge_manager::handle_notification_message( zmq_pollitem_t** pollitems, int& count_items, int& size_items ) {
+    zmq_pollitem_t* items = *pollitems;
+  
+    if( (items[0].revents | ZMQ_POLLIN) == ZMQ_POLLIN ) {
+      string json;
+      util::recv( items[0].socket, json );
+      DLOG(INFO) << "in edge manger got " << json ;
+      notification_message_ptr_t notification_message_ptr = dynamic_pointer_cast<notification_message>( message_factory( json ) );
+      string notification_type = notification_message_ptr->notification_type() ;
+      if( notification_type == "worker_broadcast" ) {
+	worker_broadcast_message_ptr_t broadcast_ptr = dynamic_pointer_cast<worker_broadcast_message>( notification_message_ptr);
+	string notification = broadcast_ptr->notification();
+	// create subscriptions for in edges
+	if( notification == "create_bindings" ) {
+	  DLOG(INFO) << "creating bindings";
+	  create_bindings( pollitems, count_items, size_items );
+	} 
+      } else {
+	LOG(WARNING) << "in edge manager get a message that it doesn't understand - " << json ;
+      }
+    }
+
+  }
+
+  void in_edge_manager::handle_collaboration_message( collaboration_context_t& context ) {
+    for( int item = 1; item < context.count_items; ++item ) {
+      if( ( context.pollitems[item].revents | ZMQ_POLLIN ) == ZMQ_POLLIN ) {
+	string json ;
+	util::recv( context.pollitems[item].socket, json );
+	LOG(INFO) << "Got collaboration message -> " << json ;
+	
+      }
+    }
+  }
 
   void in_edge_manager::operator()() {
     DLOG(INFO) << "in edge manager thread started" ;
@@ -91,24 +127,10 @@ namespace kibitz {
       while( true ) {
 	int rc = zmq_poll( pollitems, count_items, -1 ); 
 	if( rc > 0 ) {
-	  if( (pollitems[0].revents | ZMQ_POLLIN) == ZMQ_POLLIN ) {
-	    string json;
-	    util::recv( pollitems[0].socket, json );
-	    DLOG(INFO) << "in edge manger got " << json ;
-	    notification_message_ptr_t notification_message_ptr = dynamic_pointer_cast<notification_message>( message_factory( json ) );
-	    string notification_type = notification_message_ptr->notification_type() ;
-	    if( notification_type == "worker_broadcast" ) {
-	      worker_broadcast_message_ptr_t broadcast_ptr = dynamic_pointer_cast<worker_broadcast_message>( notification_message_ptr);
-	      string notification = broadcast_ptr->notification();
-	      if( notification == "create_bindings" ) {
-		DLOG(INFO) << "creating bindings";
-		create_bindings( &pollitems, count_items, size_items );
-	      } 
-	    } else {
-	      LOG(WARNING) << "in edge manager get a message that it doesn't understand - " << json ;
-	    }
-	  }
+	  handle_notification_message( &pollitems, count_items, size_items );
+	  //handle_collaboration_messages( 
 	}
+
       }
     } catch( const util::queue_interrupt& ) {
       DLOG(INFO) << "interrupt terminated in edge manager" ;

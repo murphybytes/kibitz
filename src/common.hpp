@@ -25,6 +25,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <time.h>
 
@@ -34,6 +35,7 @@ using std::string;
 using std::stringstream;
 using std::runtime_error;
 
+using boost::lexical_cast;
 using boost::format;
 using boost::shared_ptr;
 using boost::thread_group;

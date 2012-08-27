@@ -18,6 +18,7 @@ namespace kibitz {
       tree.put( "notification_type", notification_type_ );
     }
   public :
+    virtual ~notification_message() {}
     virtual string to_json() const = 0;
     const string& notification_type() const { return notification_type_ ; }
   };

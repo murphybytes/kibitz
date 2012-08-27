@@ -2,4 +2,4 @@
 
 echo "Starting worker $1 $2 publishing on $3"
 
-GLOG_log_dir=log ./src/test-worker-a -I$2 -T$1 -b'tcp://localhost:5556' -d'tcp://localhost:5557' -p$3
+GLOG_log_dir=log GLOG_minloglevel=2 ./src/test-worker-a -I$2 -T$1 -b'tcp://localhost:5556' -d'tcp://localhost:5557' -p$3
