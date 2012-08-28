@@ -16,8 +16,9 @@ namespace kibitz {
     void* zmq_context_;
     void* message_bus_socket_;
     bool signalled_;
-    callback heartbeat_handler_;
-    callback inedge_message_handler_;
+    //    callback heartbeat_handler_;
+    collaboration_callback inedge_message_handler_;
+    initialization_callback initialization_handler_;
     thread_group threads_;
     boost::mutex mutex_;
 
@@ -27,9 +28,11 @@ namespace kibitz {
     ~context();
     void set_worker_type( const string& worker_type_name ) ;
     void set_worker_id( const string& worker_id );
-    void register_heartbeat_handler( callback heartbeat_handler );
-    void register_inedge_message_handler( callback inedge_message_handler ) ;
-    callback get_inedge_message_handler() ; 
+
+    void register_initialization_notification_handler( initialization_callback initialization_handler );
+    void register_inedge_message_handler( collaboration_callback inedge_message_handler ) ;
+    collaboration_callback get_inedge_message_handler() ;
+    initialization_callback get_initialization_notification_callback() ; 
     void start() ;
     void stop() ;
     void terminate();

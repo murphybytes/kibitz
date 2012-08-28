@@ -12,7 +12,8 @@ namespace kibitz {
     :application_configuration_(application_configuration),
      zmq_context_(NULL),
      signalled_(false),
-     inedge_message_handler_(NULL)  {
+     inedge_message_handler_(NULL),
+     initialization_handler_(NULL)  {
     DLOG(INFO) << "ctor for context entered" ;
     zmq_context_ = zmq_init( application_configuration["context-threads"].as<int>() );
     DLOG(INFO) << "zmq initialized";
@@ -29,11 +30,19 @@ namespace kibitz {
   context::~context() {
   }
 
-  void context::register_inedge_message_handler( callback inedge_message_handler ) {
+  void context::register_initialization_notification_handler( initialization_callback initialization_handler ) {
+    initialization_handler_ = initialization_handler;
+  }
+
+  initialization_callback context::get_initialization_notification_callback() {
+    return initialization_handler_;
+  }
+
+  void context::register_inedge_message_handler( collaboration_callback inedge_message_handler ) {
     inedge_message_handler_ = inedge_message_handler;
   }
 
-  callback context::get_inedge_message_handler() {
+  collaboration_callback context::get_inedge_message_handler() {
     return inedge_message_handler_;
   }
 
@@ -53,10 +62,6 @@ namespace kibitz {
 
   void context::set_worker_id( const string& worker_id ) {
     worker_id_ = worker_id ;
-  }
-
-  void context::register_heartbeat_handler( callback heartbeat_handler ) {
-    heartbeat_handler_ = heartbeat_handler;
   }
 
   worker_types_t context::get_worker_types() const {
@@ -80,25 +85,13 @@ namespace kibitz {
     heartbeat_receiver hb_receiver( this );
     worker_map wmap( this );
     kibitz::in_edge_manager in_edge_manager( *this ); 
-    //   edges_t in_edges = get_in_edges() ;
-    //edges_t out_edges = get_out_edges();
-    //out_edge_manager out_edges( this );
+
     {
       boost::mutex::scoped_lock lock( mutex_ );
       threads_.create_thread( wmap );
       threads_.create_thread(hb_sender);
       threads_.create_thread(hb_receiver);
       threads_.create_thread(in_edge_manager);
-    }
-    // wait a few seconds to discover other workers
-    sleep( 5 );
-    DLOG(INFO) << ">>>>>>>>>>>>>>>> Query Edges <<<<<<<<<<<<<<<<<";
-    worker_map_ptr_t worker_map_ptr = worker_map::get_worker_map( zmq_context_ );
-    worker_types_t in_edge_types = get_worker_types();
-    BOOST_FOREACH( const string& in_edge_type, in_edge_types ) {
-      DLOG(INFO) << "Resolving workers for " << in_edge_type ;
-      worker_infos_t worker_infos = worker_map_ptr->get_in_edge_workers( in_edge_type ) ;
-      DLOG(INFO) << "Got " << worker_infos.size() << " hits";
     }
     
     threads_.join_all();

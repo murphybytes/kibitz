@@ -76,10 +76,15 @@ namespace kibitz {
 	worker_broadcast_message_ptr_t broadcast_ptr = dynamic_pointer_cast<worker_broadcast_message>( notification_message_ptr);
 	string notification = broadcast_ptr->notification();
 	// create subscriptions for in edges
-	if( notification == "create_bindings" ) {
+	if( notification == notification::CREATE_BINDINGS ) {
 	  DLOG(INFO) << "creating bindings";
 	  create_bindings( pollitems, count_items, size_items );
-	} 
+	} else if( notification == notification::INITIALIZE_JOB ) {
+	  initialization_callback cb = context_.get_initialization_notification_callback();
+	  if( cb ) {
+	    cb();
+	  }
+	}
       } else {
 	LOG(WARNING) << "in edge manager get a message that it doesn't understand - " << json ;
       }
@@ -91,7 +96,7 @@ namespace kibitz {
   bool in_edge_manager::all_messages_arrived( const string& job_id, collaboration_context_t& collab_context ) const {
     return collab_context.job_messages[job_id].size() >= (collab_context.count_items - 1);
     
-      }
+  }
 
   void in_edge_manager::handle_collaboration_message( collaboration_context_t& context ) {
     for( int item = 1; item < context.count_items; ++item ) {
@@ -113,7 +118,7 @@ namespace kibitz {
 	  string job_id = basic_collaboration->job_id() ;
 	  context.job_messages[job_id].push_back( basic_collaboration->payload() );
 	  if( all_messages_arrived( job_id, context ) ) {
-	    callback cbfn = context_.get_inedge_message_handler();
+	    collaboration_callback cbfn = context_.get_inedge_message_handler();
 	    if( cbfn ) {
 	      cbfn( job_id, context.job_messages[job_id] );
 	    } else {

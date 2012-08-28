@@ -76,14 +76,20 @@ namespace kibitz {
     }
   }
 
-  void set_message_handler( callback fn ) {
+  void set_in_message_handler( collaboration_callback fn ) {
     context_->register_inedge_message_handler( fn );
   }
 
-  void send_message( const string& job_id, const collaboration_message& message ) {
+  void set_initialization_notification_handler( initialization_callback fn ) {
+    context_->register_initialization_notification_handler( fn ) ;
+  }
+  
+  
+
+  void send_out_message( const string& payload ) {
   }
 
-  void send_notification( const notification_message& message ) {
+  void send_notification_message( const string& payload ) {
   }
   
 
