@@ -116,11 +116,14 @@ namespace kibitz {
 	if( collaboration_type == "generic" ) {
 	  basic_collaboration_message_ptr_t basic_collaboration = dynamic_pointer_cast<basic_collaboration_message>( collab_message) ;
 	  string job_id = basic_collaboration->job_id() ;
-	  context.job_messages[job_id].push_back( basic_collaboration->payload() );
+	  string worker_type = basic_collaboration->worker_type();
+	  context.job_messages[job_id][worker_type] =  basic_collaboration->payload() ;
 	  if( all_messages_arrived( job_id, context ) ) {
 	    collaboration_callback cbfn = context_.get_inedge_message_handler();
 	    if( cbfn ) {
-	      cbfn( job_id, context.job_messages[job_id] );
+	      // hang on to job id so we can attach it to send messages
+	      context_.set_job_id( job_id );	      
+	      cbfn( context.get_job_messages( job_id ) );
 	    } else {
 	      LOG(WARNING) << "Got callaboration messages, no callback defined to handle messages";
 	    }
@@ -143,7 +146,7 @@ namespace kibitz {
       // TODO: fix this if broadcast subscriber is created before broadcast publisher
       //       an exception errno 111 is raised, thus this sleep hack
       //       we want to give the publisher time to be instantiated
-      sleep( 3 );
+      sleep( 5 );
       sub broadcast_subscriber( context_.zmq_context(), HEARTBEAT_RECEIVER_BROADCASTS );
       boost::thread*  edge_monitor_thread = NULL;
       zmq_pollitem_t broadcast_pollitem = {

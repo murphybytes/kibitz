@@ -12,17 +12,26 @@ using boost::lexical_cast;
 
 
 namespace kibitz {
+
+
   class collaboration_message : public message {
     string collaboration_type_;
     string job_id_;    
     string worker_type_;
   protected:
       
-    collaboration_message( const string& collaboration_type, const string& worker_type, const string& version = "1.0" )
+    collaboration_message( const string& collaboration_type, const string& worker_type, const string& version  )
       :message( "collaboration", version ),
        collaboration_type_( collaboration_type ),
        job_id_( lexical_cast<string>(boost::uuids::random_generator()() )),
        worker_type_( worker_type )  {
+    }
+    
+    collaboration_message( const string& collaboration_type, const string& worker_type, const string& job_id, const string& version  )
+      :message( "collaboration", version ),
+       collaboration_type_(collaboration_type),
+       worker_type_(worker_type),
+       job_id_( job_id ) {
     }
 
 

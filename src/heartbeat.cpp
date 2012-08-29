@@ -14,7 +14,7 @@ namespace kibitz {
      worker_id_( config["worker-id"].as<int>() ),
      host_name_( boost::asio::ip::host_name() ),
      pid_(getpid()),
-     port_( config["tcp-port"].as<int>()),
+     port_( config["publish-port"].as<int>()),
      ticks_(0) {
 
 

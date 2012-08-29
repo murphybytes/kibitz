@@ -1,7 +1,7 @@
 #include "kibitz.hpp"
 
 
-void message_handler( const string& job_id, const kibitz::collaboration_messages_t& messages ) ; 
+void message_handler( const kibitz::collaboration_messages_t& messages ) ; 
 void notification_handler( );
 
 int main( int argc, char* argv[] ) {
@@ -25,11 +25,27 @@ int main( int argc, char* argv[] ) {
 }
 
 
-void message_handler( const string& job_id, const kibitz::collaboration_messages_t& messages )  {
-  DLOG(INFO) << "messages for " << job_id << " got " << messages.size() ;
+void message_handler( const kibitz::collaboration_messages_t& messages )  {
+  DLOG(INFO) << "message_handler got "  << messages.size()  << " messages";
+  string payload ;
+  BOOST_FOREACH( const string& message, messages ) {
+    if( payload.empty() ) {
+      payload = message;
+    } else {
+      payload += " > ";
+      payload += message;
+    }
+    
+  }
+
+  payload += " > ";
+  payload += "next message";
+
+  kibitz::send_out_message( payload );
 } 
 
 
 void notification_handler( ) {
   DLOG(INFO) << ">>>>>>>>>>>>>>> NOTIFY <<<<<<<<<<<<<<<<<<" ;
+  kibitz::send_out_message( "initial message" );
 }

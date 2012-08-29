@@ -21,7 +21,8 @@ int test_main( int argc, char* argv[] ) {
     ( "worker-id,I", po::value< int >()->default_value(1), "xxx" )
     ( "worker-type,T", po::value< string >()->default_value("test-worker"), "(Required) Name of the type of worker." )
     ( "multicast-binding,b", po::value<string>()->default_value("xxx"), "(Required) zmq epgm multicast binding" )
-    ( "tcp-port,p", po::value<int>()->default_value(8999), "Port for tcp based zmq messages" )
+    ( "publish-port,p", po::value<int>()->default_value(8999), "Port for tcp based zmq messages" )
+    ( "notification-port,P", po::value<int>()->default_value(9999), "port to publish notification messages")
     ( "context-threads,t", po::value< int >()->default_value( 1 ), "Thread count passed to zmq_init" )
     ;
   po::variables_map command_line;

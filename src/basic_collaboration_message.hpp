@@ -8,7 +8,11 @@ namespace kibitz {
     string payload_;
   public:
     basic_collaboration_message( const string& worker_type, const string& payload ) 
-      :collaboration_message( "generic", worker_type ),
+      :collaboration_message( "generic", worker_type, "1.0" ),
+       payload_(payload) {
+    }
+    basic_collaboration_message( const string& worker_type, const string& job_id, const string& payload )
+      :collaboration_message( "generic", worker_type, job_id, "1.0" ),
        payload_(payload) {
     }
 

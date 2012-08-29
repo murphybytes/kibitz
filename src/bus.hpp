@@ -14,6 +14,7 @@ namespace kibitz {
     virtual ~bus();
   public:
     void* socket() { return socket_; }
+    void close() ; 
   };
 
   class pub : public bus {

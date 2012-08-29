@@ -5,6 +5,8 @@
 #include "worker_map.hpp"
 #include <yaml-cpp/yaml.h>
 #include "in_edge_manager.hpp"
+#include "basic_collaboration_message.hpp"
+
 namespace kibitz {
 
 
@@ -13,21 +15,44 @@ namespace kibitz {
      zmq_context_(NULL),
      signalled_(false),
      inedge_message_handler_(NULL),
-     initialization_handler_(NULL)  {
+     initialization_handler_(NULL) {
+
     DLOG(INFO) << "ctor for context entered" ;
     zmq_context_ = zmq_init( application_configuration["context-threads"].as<int>() );
     DLOG(INFO) << "zmq initialized";
-    message_bus_socket_ = zmq_socket( zmq_context_, ZMQ_PUB );
-    if( !message_bus_socket_ ) {
-      throw std::runtime_error( "Failed to create message bus socket."); 
-    }
-    int rc = zmq_bind( message_bus_socket_, INPROC_COMMAND_BINDING ) ;
-    if( rc ) {
-      throw std::runtime_error( "Failed to create binding for internal message bus" );
-    }
+    message_bus_socket_ = util::create_socket( zmq_context_, ZMQ_PUB );
+    util::check_zmq( zmq_bind( message_bus_socket_, INPROC_COMMAND_BINDING ) );
+    stringstream stm1, stm2;
+    stm1 << "tcp://*:" << application_configuration["publish-port"].as<int>();
+    stm2 << "tcp://*:" << application_configuration["notification-port"].as<int>();
+    
+    collaboration_publisher_ptr_ = shared_ptr<pub>( new pub( zmq_context_, stm1.str().c_str()   ) );
+
+    notification_publisher_ptr_ = shared_ptr<pub>( new pub( zmq_context_, stm2.str().c_str() ) );
   }
 
   context::~context() {
+  }
+
+  void context::send_out_message( const string& payload )  {
+    string worker_type = application_configuration_["worker-type"].as<string>();
+    string job_id;
+    get_job_id( job_id );
+    string json;
+    if( job_id.empty() ) {
+      basic_collaboration_message msg( worker_type, payload );
+      json = msg.to_json();
+    } else {
+      basic_collaboration_message msg( worker_type, job_id, payload );
+      json = msg.to_json();
+    }
+    
+    collaboration_publisher_ptr_->send( json );
+
+  }
+
+  void context::send_notification_message( const string& payload ) {
+    notification_publisher_ptr_->send( payload );
   }
 
   void context::register_initialization_notification_handler( initialization_callback initialization_handler ) {
@@ -73,7 +98,7 @@ namespace kibitz {
       parser.GetNextDocument( doc );
       YAML::Iterator it = doc.begin();
       it.second() >> worker_types;
-     }
+    }
     return worker_types;
   }
 
@@ -86,13 +111,11 @@ namespace kibitz {
     worker_map wmap( this );
     kibitz::in_edge_manager in_edge_manager( *this ); 
 
-    {
-      boost::mutex::scoped_lock lock( mutex_ );
-      threads_.create_thread( wmap );
-      threads_.create_thread(hb_sender);
-      threads_.create_thread(hb_receiver);
-      threads_.create_thread(in_edge_manager);
-    }
+    threads_.create_thread( wmap );
+    threads_.create_thread(hb_sender);
+    threads_.create_thread(hb_receiver);
+    threads_.create_thread(in_edge_manager);
+
     
     threads_.join_all();
 
@@ -105,10 +128,10 @@ namespace kibitz {
 
   void context::terminate() {
     DLOG(INFO) << "context.terminate shutting down application" ;
+    collaboration_publisher_ptr_->close();
+    notification_publisher_ptr_->close();
 
-    if( message_bus_socket_ ) {
-      zmq_close( message_bus_socket_ );
-    }
+    util::close_socket( message_bus_socket_ );
 
     if( zmq_context_ ) {
       zmq_term( zmq_context_ );
@@ -119,6 +142,16 @@ namespace kibitz {
     return zmq_context_; 
   }
 
+
+  void context::set_job_id( const string& job_id ) {
+    boost::mutex::scoped_lock lock( mutex_ ) ;
+    current_job_id_ = job_id;
+  }
+
+  void context::get_job_id( string& job_id ) {
+    boost::mutex::scoped_lock lock( mutex_ );
+    job_id = current_job_id_;
+  }
  
 }
 

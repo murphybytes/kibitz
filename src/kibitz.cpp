@@ -44,7 +44,8 @@ namespace kibitz {
       ( "configuration-file,f", po::value< string >(), "(Required) Path to configuration file containing in edges and out edges" ) 
       ( "heartbeat-binding,b", po::value<string>(), "zmq tcp binding for publishing heartbeats" )
       ( "discovery-binding,d", po::value<string>(), "zmq tcp binding for recieving locator information" )
-      ( "tcp-port,p", po::value<int>()->default_value(8999), "Port for tcp based zmq messages" )
+      ( "publish-port,p", po::value<int>()->default_value(8999), "Port to publish for collaboration messages" )
+      ( "notification-port,P", po::value<int>()->default_value(9999), "Port to publish notification messages")
       ( "context-threads,t", po::value< int >()->default_value( 1 ), "Thread count passed to zmq_init" )
       ( "heartbeat-frequency,h", po::value< int >()->default_value( 1000 ), "Heartbeat frequency in milliseconds" )
       ;
@@ -87,9 +88,11 @@ namespace kibitz {
   
 
   void send_out_message( const string& payload ) {
+    context_->send_out_message( payload );
   }
 
   void send_notification_message( const string& payload ) {
+    context_->send_notification_message( payload );
   }
   
 

@@ -9,8 +9,15 @@ namespace kibitz {
 
     struct collaboration_context_t {
       int count_items;
-      std::map< string, collaboration_messages_t > job_messages;
+      std::map< string, std::map< string, string >  > job_messages;
       zmq_pollitem_t* pollitems;
+      std::vector<string> get_job_messages( const string& job_id ) {
+	std::vector<string> result;
+	for( std::map<string,string>::iterator it = job_messages[job_id].begin(); it != job_messages[job_id].end(); ++it ){
+	  result.push_back( it->second );
+	}
+	return result;
+      }
     };
 
     context& context_;

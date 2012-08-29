@@ -2,7 +2,7 @@
 #define __CONTEXT_HPP__
 
 #include "kibitz.hpp"
-
+#include "bus.hpp"
 
 namespace kibitz {
 
@@ -21,7 +21,9 @@ namespace kibitz {
     initialization_callback initialization_handler_;
     thread_group threads_;
     boost::mutex mutex_;
-
+    string current_job_id_;
+    shared_ptr< pub > collaboration_publisher_ptr_;
+    shared_ptr< pub > notification_publisher_ptr_;
 
   public:
     context( const po::variables_map& application_configuration );
@@ -39,19 +41,14 @@ namespace kibitz {
     void* zmq_context() ;
     void send_internal_message( const char* message ) ;
     worker_types_t get_worker_types() const;
-    /**
-     * Adds a thread to message processing threads, primarily used 
-     * to switch out inedge monitoring threads
-     */
-    template< typename F >
-    boost::thread* swap_thread( F new_thread_fnc, boost::thread* old_thread = NULL) {
-      boost::mutex::scoped_lock( mutex_ );
-      if( old_thread ) { 
-	threads_.remove_thread( old_thread );
-      }
-      return threads_.create_thread( new_thread_fnc );
-    }
+   
     const po::variables_map& get_config() const; 
+
+    void send_out_message( const string& payload ) ;
+    void send_notification_message( const string& payload );
+    void set_job_id( const string& job_id ) ;
+    void get_job_id( string& job_id );
+  
   };
 
   typedef shared_ptr< context > context_ptr;

@@ -15,6 +15,11 @@ namespace kibitz {
 
   }
 
+  void bus::close() {
+    util::close_socket( socket_ ) ;
+    socket_ = NULL;
+  }
+
   pub::pub( void* zmq_context, const char* binding )
     :bus( zmq_context, binding, ZMQ_PUB ) {
     util::check_zmq( zmq_bind( socket_, binding ) );
