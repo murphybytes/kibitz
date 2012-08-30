@@ -20,8 +20,6 @@ namespace kibitz {
     string collaboration_type_;
     string job_id_;
   protected:
-
-    
       
     collaboration_message( const string& collaboration_type, const string& version = "1.0"  )
       :message( "collaboration", version ),
@@ -44,9 +42,9 @@ namespace kibitz {
   public:
     virtual ~collaboration_message() {}
     virtual string to_json() const = 0;
-    const string& collaboration_type() const { return collaboration_type_ ; }
-    const string& job_id() const { return job_id_; }
-    void set_job_id( const string& job_id ) { job_id_ = job_id; }
+    virtual const string& collaboration_type() const { return collaboration_type_ ; }
+    virtual const string& job_id() const { return job_id_; }
+    virtual void set_job_id( const string& job_id ) { job_id_ = job_id; }
   };
 
   typedef shared_ptr<collaboration_message> collaboration_message_ptr_t;

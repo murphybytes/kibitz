@@ -14,4 +14,16 @@ namespace kibitz {
     return  stm.str() ;
   }
 
+  basic_collaboration_message::basic_collaboration_message( const string& worker_type, const string& payload ) 
+      :collaboration_message( "generic" ),
+       worker_type_( worker_type ),
+       payload_(payload) {
+    }
+
+  basic_collaboration_message::basic_collaboration_message( const ptree& json )
+    :collaboration_message( json ),
+     worker_type_( json.get<string>("worker_type") ),
+     payload_( json.get<string>( "payload" ) ) {
+  }
+
 }

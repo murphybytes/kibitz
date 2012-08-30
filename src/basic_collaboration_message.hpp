@@ -1,6 +1,8 @@
 #ifndef basic_collaboration_message_hpp
 #define basic_collaboration_message_hpp
 
+
+
 #include "collaboration_message.hpp"
 
 
@@ -12,18 +14,9 @@ namespace kibitz {
     string payload_;
 
   public:
-    basic_collaboration_message( const string& worker_type, const string& payload ) 
-      :collaboration_message( "generic" ),
-       worker_type_( worker_type ),
-       payload_(payload) {
-    }
+    basic_collaboration_message( const string& worker_type, const string& payload ) ;
 
-    basic_collaboration_message( const ptree& json ) 
-      :collaboration_message( json ),
-       worker_type_( json.get<string>( "worker_type" ) ),
-       payload_( json.get<string>( "payload" ) ) {
-
-    }
+    basic_collaboration_message( const ptree& json ) ;
 
     virtual ~basic_collaboration_message() {}
     const string& worker_type() const { return worker_type_ ; }
