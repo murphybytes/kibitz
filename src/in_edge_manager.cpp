@@ -4,11 +4,14 @@
 #include "context.hpp"
 #include "worker_broadcast_message.hpp"
 #include "basic_collaboration_message.hpp"
+#include "job_initialization_message.hpp"
 #include "worker_map.hpp"
 
 namespace kibitz {
   in_edge_manager::in_edge_manager( context& ctx  ) 
-    :context_( ctx )   {
+    :context_( ctx ),
+     worker_type_( ctx.get_config()["worker-type"].as<string>() ),
+     worker_id_( ctx.get_config()["worker-id"].as<int>() ) {
   }
 
   in_edge_manager::~in_edge_manager()   {
@@ -79,17 +82,28 @@ namespace kibitz {
 	if( notification == notification::CREATE_BINDINGS ) {
 	  DLOG(INFO) << "creating bindings";
 	  create_bindings( pollitems, count_items, size_items );
-	} else if( notification == notification::INITIALIZE_JOB ) {
-	  initialization_callback cb = context_.get_initialization_notification_callback();
-	  if( cb ) {
-	    cb();
-	  }
 	}
+      } else if( notification_type == notification::JOB_INITIALIZATION ) {
+	check_and_start_job( notification_message_ptr );
       } else {
 	LOG(WARNING) << "in edge manager get a message that it doesn't understand - " << json ;
       }
     }
 
+  }
+  
+  void in_edge_manager::check_and_start_job( notification_message_ptr_t message ) {
+    DLOG(INFO) << "Got job initialization message ";
+    job_initialization_message_ptr_t job_init_message = dynamic_pointer_cast<job_initialization_message>( message );
+    CHECK( job_init_message != NULL ) << "invalid notification message cast to job init message";
+    // only targeted worker will execute init callback, if such callback has been implemented
+    if( job_init_message->worker_type() == worker_type_ ) {
+      if( job_init_message->worker_id() == worker_id_ ) {
+	initialization_callback cb = context_.get_initialization_notification_callback();
+	CHECK( cb != NULL ) << "Sent a job initialization message to a worker without an initialization callback";
+	cb();
+      }
+    }
   }
 
 

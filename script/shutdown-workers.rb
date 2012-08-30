@@ -11,8 +11,8 @@ begin
   socket = ctx.socket ZMQ::PUSH
   rc = socket.connect ARGV[0]
 
-  notification = "create_bindings"
-  #notification = "initialize_job"
+  notification = "shutdown"
+
 
 
   message = { 

@@ -3,8 +3,9 @@
 #include "worker_map.hpp"
 #include "heartbeat.hpp"
 #include "worker_broadcast_message.hpp"
+#include "job_initialization_message.hpp"
 #include "bus.hpp"
-
+#include <signal.h>
 using kibitz::util::create_socket;
 using kibitz::util::check_zmq;
 
@@ -42,14 +43,24 @@ namespace kibitz {
 	kibitz::util::recv( socket, json );
 	DLOG(INFO) << "Received message" << json;
 	notification_message_ptr_t message_ptr = dynamic_pointer_cast<notification_message>( message_factory( json ) );
-	string notification_type = message_ptr->notification_type();
-	if( notification_type == "heartbeat" ) {
-	  worker_map_ptr->send_worker_notification_from_heartbeat( json );
-	} else if( notification_type == "worker_broadcast" ) {
-	  broadcast_publisher.send( message_ptr->to_json()  );
+	if( message_ptr != NULL ) {
+	  string notification_type = message_ptr->notification_type();
+	  if( notification_type == "heartbeat" ) {
+	    worker_map_ptr->send_worker_notification_from_heartbeat( json );
+	  } else if( notification_type == "worker_broadcast"  ) {
+	    worker_broadcast_message_ptr_t wb = dynamic_pointer_cast<worker_broadcast_message>( message_ptr ) ;
+	    if( wb->notification() == "shutdown" ) {
+	      exit( 0 ) ;
+	    } else {
+	      broadcast_publisher.send( message_ptr->to_json()  );
+	    }
+	  } else if( notification_type == notification::JOB_INITIALIZATION ) {
+	    broadcast_publisher.send( message_ptr->to_json() );
+	  } else {	
+	    LOG(ERROR) << "We got a message we don't know how to handle - " << json;
+	  }
 	} else {
-	
-	  LOG(ERROR) << "We got a message we don't know how to handle - " << json;
+	  LOG(ERROR) << "Unknown message type. Raw message = " << json;
 	}
 	
       }

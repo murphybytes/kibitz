@@ -19,6 +19,11 @@ using std::string;
 using std::stringstream;
 
 namespace kibitz {
+
+  namespace notification {
+    static const char* WORKER_TYPE = "worker_type";
+    static const char* WORKER_ID = "worker_id";
+  } 
   
 
   class message {
@@ -28,6 +33,9 @@ namespace kibitz {
     message( const string& message_type, const string& version  )
       :message_type_(message_type),
        version_( version )  {}
+    message( const ptree& json ) 
+      :message_type_( json.get<string>("message_type") ),
+       version_( json.get<string>("version") ) {}
     virtual void populate_header( ptree& tree ) const {
       tree.put( "message_type", message_type_ );
       tree.put( "version", version_ );

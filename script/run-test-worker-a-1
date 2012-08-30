@@ -1,5 +1,0 @@
-#!/bin/bash
-
-
-GLOG_log_dir=log ./src/test-worker-a -I1 -Ttest_worker_a -b'tcp://localhost:5556' -d'tcp://localhost:5557' 
-

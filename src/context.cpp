@@ -38,16 +38,14 @@ namespace kibitz {
     string worker_type = application_configuration_["worker-type"].as<string>();
     string job_id;
     get_job_id( job_id );
-    string json;
-    if( job_id.empty() ) {
-      basic_collaboration_message msg( worker_type, payload );
-      json = msg.to_json();
-    } else {
-      basic_collaboration_message msg( worker_type, job_id, payload );
-      json = msg.to_json();
+
+    basic_collaboration_message msg( worker_type, payload );    
+    if( !job_id.empty() ) {
+      msg.set_job_id( job_id ) ;
     }
+
     
-    collaboration_publisher_ptr_->send( json );
+    collaboration_publisher_ptr_->send( msg.to_json() );
 
   }
 

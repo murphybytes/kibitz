@@ -11,15 +11,16 @@ begin
   socket = ctx.socket ZMQ::PUSH
   rc = socket.connect ARGV[0]
 
-  notification = "create_bindings"
-  #notification = "initialize_job"
+
+  notification = "initialize_job"
 
 
   message = { 
     "message_type" => "notification",
     "version" => "1.0",
-    "notification_type" => "worker_broadcast",
-    "notification" => notification 
+    "notification_type" => "job_initialization",
+    "worker_type" => "test_worker_c",
+    "worker_id" => 1
   }
 
   

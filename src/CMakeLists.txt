@@ -10,6 +10,8 @@ add_library( kibitz_messages SHARED
   worker_query.cpp
   worker_query_response.cpp
   worker_broadcast_message.cpp
+  job_initialization_message.cpp
+  basic_collaboration_message.cpp
 )
 
 

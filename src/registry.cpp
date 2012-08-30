@@ -6,6 +6,8 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include "worker_broadcast_message.hpp"
+#include "job_initialization_message.hpp"
+
 using boost::property_tree::ptree;
 
 using namespace google;
@@ -72,6 +74,11 @@ void registry::operator()() {
 	kibitz::worker_broadcast_message_ptr_t broadcast_ptr = dynamic_pointer_cast<kibitz::worker_broadcast_message>( message_ptr );
 	LOG(INFO) << "Publishing " << broadcast_ptr->notification() << " to all workers";
 	kibitz::util::send( publisher_socket_, broadcast_ptr->to_json() );
+      }
+
+      if( notification_type == kibitz::notification::JOB_INITIALIZATION ) {
+	LOG(INFO) << "Publishing notification type -> " << notification_type ;
+	kibitz::util::send( publisher_socket_, message_ptr->to_json() );
       }
 
       if( notification_type == "heartbeat" ) {
