@@ -1,7 +1,9 @@
 kibitz
 ======
 
-A message centric grid computing environment
+A message centric grid computing environment. 
+
+See the wiki for details on using the library. https://github.com/murphybytes/kibitz/wiki
 
 Building
 ------------
