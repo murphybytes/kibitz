@@ -41,7 +41,7 @@ namespace kibitz {
 	// TODO if we dont receive a heartbeat after a certain amount of time
 	// try to connect to alternative locator
 	kibitz::util::recv( socket, json );
-	DLOG(INFO) << "Received message" << json;
+	DLOG(INFO) << context_->worker_type() << ":" << context_->worker_id() << " received message " << json;
 	notification_message_ptr_t message_ptr = dynamic_pointer_cast<notification_message>( message_factory( json ) );
 	if( message_ptr != NULL ) {
 	  string notification_type = message_ptr->notification_type();

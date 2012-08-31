@@ -87,9 +87,9 @@ namespace kibitz {
       while( true ) {
 	string json ;
 	util::recv( socket, json );
-	DLOG(INFO) << "worker map manager got " << json;
+	DLOG(INFO) << context_->worker_type() << ":" << context_->worker_id() << " worker map manager got " << json;
 	message_ptr_t message = message_factory( json );
-	assert( message->message_type() == "notification" );
+	CHECK( message->message_type() == "notification" ) << "didn't get expected notification message";
 	string notification_type = dynamic_pointer_cast<notification_message>(message)->notification_type(); 
 	if( notification_type == "worker_notification" ){
 	  handle_worker_notification( message, worker_map );
@@ -100,13 +100,13 @@ namespace kibitz {
 	if( notification_type == "worker_query" ) {
 	  worker_query_ptr_t query_ptr = dynamic_pointer_cast<worker_query>( message );
 	  //worker_infos_t worker_infos;
-
+	  DLOG(INFO) << "WORKER QUERY BY " << context_->worker_type() << ":" << context_->worker_id() ;
 	  worker_map_t::iterator hits = worker_map.find( query_ptr->worker_type() ) ;
 	  worker_infos_t worker_infos = process_query( query_ptr->worker_type(), worker_map );
 	  worker_query_response wqr;
 	  wqr.set_workers( worker_infos );
 	  string wqr_response = wqr.to_json();
-	  DLOG(INFO) << "Sending worker query response " << wqr_response;
+	  DLOG(INFO) << "Sending " << context_->worker_type() << ":" << context_->worker_id() << " query response " << wqr_response;
 	  util::send( socket, wqr_response );
 
 	}

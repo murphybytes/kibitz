@@ -131,6 +131,7 @@ namespace kibitz {
 	  basic_collaboration_message_ptr_t basic_collaboration = dynamic_pointer_cast<basic_collaboration_message>( message_factory( json ) ) ;
 	  string job_id = basic_collaboration->job_id() ;
 	  string worker_type = basic_collaboration->worker_type();
+	  DLOG(INFO) << "worker " << context_.worker_type() << ":" << context_.worker_id()  << " got a message from " << worker_type << " job " << job_id;
 	  context.job_messages[job_id][worker_type] =  basic_collaboration->payload() ;
 	  if( all_messages_arrived( job_id, context ) ) {
 	    collaboration_callback cbfn = context_.get_inedge_message_handler();

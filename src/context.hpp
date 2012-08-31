@@ -30,6 +30,9 @@ namespace kibitz {
     ~context();
     void set_worker_type( const string& worker_type_name ) ;
     void set_worker_id( const string& worker_id );
+    
+    const string& worker_type() const { return application_configuration_["worker-type"].as<string>(); }
+    int worker_id() { return application_configuration_["worker-id"].as<int>() ; } 
 
     void register_initialization_notification_handler( initialization_callback initialization_handler );
     void register_inedge_message_handler( collaboration_callback inedge_message_handler ) ;
