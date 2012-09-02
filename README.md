@@ -64,6 +64,27 @@ cmake -DBUILD_SHARED_LIBS=ON
 #### Mac OSX
 brew install yaml-cpp
 
+Management Scripts
+------------------------
+Kibitz provides a handy control script to manage jobs.  You'll need to install ruby and RVM to use
+these scripts.  
+
+#### RVM
+
+https://rvm.io/
+
+Once you install RVM there is a control script in the project root that will set the rest of the Ruby 
+dependencies. (.rvmrc)  This script will run the first time you enter the project root directory and download
+Ruby gems and install the appropriate version of Ruby.  Once installation is complete you can run
+
+```
+# stops workers
+script\kibitz stop
+
+#starts a job
+KIBITZ_LOCATOR='tcp://196.1.3.122:5556' script\kibitz initiate --worker-type=starter --worker-id=1
+
+```
 
 Components
 ------------------------
