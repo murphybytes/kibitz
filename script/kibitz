@@ -1,0 +1,112 @@
+#!//usr/bin/env ruby
+
+require 'ffi-rzmq'
+require 'json'
+require 'trollop'
+
+# kick off job
+def send_initiate_message( socket, worker_type, worker_id, global_opts )
+  # first tell all workers to query locator for their bindings to 
+  # parent workers
+
+  raise "Missing worker type" if worker_type.nil?
+  raise "Missing worker id" if worker_id.nil?
+
+  message = { 
+    "message_type" => "notification",
+    "version" => "1.0",
+    "notification_type" => "worker_broadcast",
+    "notification" => "create_bindings" 
+  }
+
+  socket.send_string message.to_json
+  
+  sleep global_opts[:command_pause] 
+
+  message = { 
+    "message_type" => "notification",
+    "version" => "1.0",
+    "notification_type" => "job_initialization",
+    "worker_type" => worker_type,
+    "worker_id" => worker_id
+  }
+  
+  socket.send_string message.to_json
+
+end
+
+# tells all workers to stop
+def send_stop_message( socket )
+
+  message = { 
+    "message_type" => "notification",
+    "version" => "1.0",
+    "notification_type" => "worker_broadcast",
+    "notification" => "shutdown" 
+  }
+
+  
+  socket.send_string message.to_json
+
+end
+
+SUB_COMMANDS = %w(initiate stop)
+
+global_opts = Trollop::options do
+  banner "Kibitz worker control utility"
+  opt :locator, "ZMQ binding for locator", :type => :string
+  opt :command_pause, "Amount of time to allow between commands.", :default => 5
+  stop_on SUB_COMMANDS
+end
+
+cmd = ARGV.shift # get the subcommand
+cmd_opts = case cmd
+           when "initiate" 
+             Trollop::options do
+    opt :worker_type, "Type of worker that will perform the initialization", :type => :string
+    opt :worker_id, "ID of worker that will perform the initialization", :default => 1
+  end
+           when "stop"  
+             Trollop::options do
+    #opt :double, "Copy twice for safety's sake"
+  end
+           else
+             Trollop::die "unknown subcommand #{cmd.inspect}"
+           end
+
+# puts "Global options: #{global_opts.inspect}"
+# puts "Subcommand: #{cmd.inspect}"
+# puts "Subcommand options: #{cmd_opts.inspect}"
+# puts "Remaining arguments: #{ARGV.inspect}"
+
+
+begin
+  ctx = ZMQ::Context.new
+  socket = ctx.socket ZMQ::PUSH
+  # try to get locator binding from command line, else use KIBITZ_LOCATOR environment var
+  binding = nil
+  binding = ENV['KIBITZ_LOCATOR'] if ENV.key?( 'KIBITZ_LOCATOR' )
+  binding = global_opts[:locator] unless global_opts[:locator].nil?
+  raise "Locator binding is missing" if binding.nil?
+  rc = socket.connect binding
+
+  case cmd
+  when "initiate"
+    send_initiate_message( socket, cmd_opts[:worker_type], cmd_opts[:worker_id], global_opts )
+  when "stop"
+    send_stop_message( socket )
+  end
+
+  socket.close
+  ctx.terminate
+  exit 0
+rescue => e
+  puts "script failed -> #{e.message}"
+  puts e.backtrace.join("\n")
+end
+
+exit 1
+
+
+
+

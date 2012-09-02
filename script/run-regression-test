@@ -11,11 +11,9 @@ KIBITZ_ROLE=CHILD GLOG_log_dir=log GLOG_minloglevel=0 ./src/regression-tester -I
 echo "wait 5 seconds for heartbeats to perculate throughout system"
 sleep 5 
 echo "Workers started establishing collaboration connections and running jobs"
-
-ruby script/setup-collaboration.rb 'tcp://localhost:5556'
+KIBITZ_LOCATOR='tcp://localhost:5556' script/kibitz initiate --worker-type=test_worker_a --worker-id=1 
 sleep 5 
-ruby script/start-collaboration.rb 'tcp://localhost:5556'
-ruby script/shutdown-workers.rb 'tcp://localhost:5556'
+KIBITZ_LOCATOR='tcp://localhost:5556' script/kibitz stop 
 
 
 

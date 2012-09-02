@@ -5,6 +5,7 @@ GEM
     ffi-rzmq (0.9.6)
       ffi
     json (1.7.5)
+    trollop (2.0)
 
 PLATFORMS
   ruby
@@ -12,3 +13,4 @@ PLATFORMS
 DEPENDENCIES
   ffi-rzmq
   json
+  trollop

@@ -15,9 +15,7 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
-
-using boost::lexical_cast;
-using namespace boost::filesystem;
+#include <glog/logging.h>
 
 #include <iostream>
 #include <fstream>
@@ -30,6 +28,8 @@ using namespace boost::filesystem;
 
 using namespace std;
 using kibitz::context_information_t;
+using boost::lexical_cast;
+using namespace boost::filesystem;
 
 void message_handler( const kibitz::collaboration_messages_t& messages ) ; 
 void notification_handler( );
@@ -46,7 +46,8 @@ int main( int argc, char* argv[] ) {
     kibitz::initialize( argc, argv );
     // ROOT, CHILD
     string role = getenv( "KIBITZ_ROLE" );
-    assert( !role.empty() );
+    CHECK( !role.empty() ) << "Role is not defined";
+    DLOG(INFO) << "Role is " << role;
 
     if( role == "ROOT" ) {
       kibitz::set_initialization_notification_handler( notification_handler );
@@ -77,6 +78,8 @@ void message_handler( const kibitz::collaboration_messages_t& messages )  {
   record_in_message( stm.str() );
   
   string payload = lexical_cast<string>( boost::uuids::random_generator()());
+
+  record_out_message( payload );
   kibitz::send_out_message( payload );
 } 
 
@@ -84,14 +87,14 @@ void message_handler( const kibitz::collaboration_messages_t& messages )  {
 void notification_handler( ) {
   string payload = lexical_cast<string>( boost::uuids::random_generator()());
   record_out_message( payload );
-  kibitz::send_out_message( "initial message" );
+  kibitz::send_out_message( payload );
 }
 
 
 
 
 void record_message( const string& filename, const string& message ) {
-
+  DLOG(INFO) << "Writing test file " << filename << " with " << message;  
   path test_file_path = (current_path() /= "test") /= filename;
   ofstream stm ;
   stm.open( test_file_path.c_str() );
@@ -105,6 +108,7 @@ void record_out_message( const string& out ) {
   kibitz::get_context_information( context_info );
   stringstream stm;
   stm << context_info.worker_type << "." << context_info.worker_id << ".out";
+
   record_message( stm.str(), out );
 
 }
