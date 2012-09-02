@@ -41,6 +41,7 @@ using boost::shared_ptr;
 using boost::thread_group;
 using boost::property_tree::ptree; 
 using boost::dynamic_pointer_cast;
+using boost::static_pointer_cast;
 using namespace boost::posix_time;
 
 namespace po = boost::program_options;

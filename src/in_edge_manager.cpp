@@ -128,7 +128,7 @@ namespace kibitz {
 	string collaboration_type = collab_message->collaboration_type();
 
 	if( collaboration_type == "generic" ) {
-	  basic_collaboration_message_ptr_t basic_collaboration = dynamic_pointer_cast<basic_collaboration_message>( message_factory( json ) ) ;
+	  basic_collaboration_message_ptr_t basic_collaboration = static_pointer_cast<basic_collaboration_message>( collab_message ) ;
 	  string job_id = basic_collaboration->job_id() ;
 	  string worker_type = basic_collaboration->worker_type();
 	  DLOG(INFO) << "worker " << context_.worker_type() << ":" << context_.worker_id()  << " got a message from " << worker_type << " job " << job_id;

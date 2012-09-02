@@ -2,7 +2,7 @@ require 'ffi-rzmq'
 require 'json'
 
 if ARGV.length != 1 
-  puts ruby setup-collaboration.rb <locatorbinding>
+  puts "ruby shutdown-workers.rb <locatorbinding>"
   exit 
 end
 
