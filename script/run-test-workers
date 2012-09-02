@@ -1,4 +1,4 @@
-xf!#/bin/bash
+!#/bin/bash
 
 ./script/run-test-worker test_worker_a 1 9000 9100 ./config/test-worker-a.yaml &
 ./script/run-test-worker test_worker_a 2 9001 9101 ./config/test-worker-a.yaml &

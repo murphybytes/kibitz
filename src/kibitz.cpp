@@ -1,4 +1,5 @@
 #include "kibitz.hpp"
+#include "common.hpp"
 #include "context.hpp"
 //#include "heartbeat_sender.hpp"
 #include <signal.h>
@@ -94,7 +95,13 @@ namespace kibitz {
   void send_notification_message( const string& payload ) {
     context_->send_notification_message( payload );
   }
-  
+
+
+  void get_context_information( context_information_t& context_information ) {
+    context_information.worker_type = context_->worker_type();
+    context_information.worker_id = context_->worker_id();
+    context_->get_job_id( context_information.job_id );
+  }
 
 }
 

@@ -1,7 +1,8 @@
 #ifndef __CONTEXT_HPP__
 #define __CONTEXT_HPP__
 
-#include "kibitz.hpp"
+
+#include "common.hpp"
 #include "bus.hpp"
 
 namespace kibitz {

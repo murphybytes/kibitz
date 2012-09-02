@@ -1,7 +1,7 @@
 #ifndef in_edge_manager_hpp
 #define in_edge_manager_hpp
 
-#include "kibitz.hpp"
+#include "common.hpp"
 #include "worker_info.hpp"
 #include "notification_message.hpp"
 

@@ -50,7 +50,7 @@ namespace pt = boost::property_tree;
 
 using namespace google;
 #include "bindings.hpp"
-
+#include "kibitz.hpp"
 
 // misc helper functions
 namespace kibitz {

@@ -1,7 +1,7 @@
 #ifndef bus_hpp
 #define bus_hpp
 
-#include "kibitz.hpp"
+#include "common.hpp"
 
 
 namespace kibitz {

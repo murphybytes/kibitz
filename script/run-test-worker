@@ -1,6 +1,7 @@
+
 #!/bin/bash
 
 echo "Starting worker $1 $2 publishing on $3 and $4 config $5"
 
 
-GLOG_log_dir=log GLOG_minloglevel=0 ./src/test-worker-a -I$2 -T$1 -b'tcp://localhost:5556' -d'tcp://localhost:5557' -p$3 -P$4 -f$5
+GLOG_log_dir=log GLOG_minloglevel=0 ./src/test-worker -I$2 -T$1 -b'tcp://localhost:5556' -d'tcp://localhost:5557' -p$3 -P$4 -f$5

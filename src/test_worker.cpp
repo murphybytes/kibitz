@@ -1,5 +1,10 @@
+#include <iostream>
+#include <stdexcept>
+#include <string>
+#include <boost/foreach.hpp>
 #include "kibitz.hpp"
 
+using std::string;
 
 void message_handler( const kibitz::collaboration_messages_t& messages ) ; 
 void notification_handler( );
@@ -26,7 +31,6 @@ int main( int argc, char* argv[] ) {
 
 
 void message_handler( const kibitz::collaboration_messages_t& messages )  {
-  DLOG(INFO) << "message_handler got "  << messages.size()  << " messages";
   string payload ;
   BOOST_FOREACH( const string& message, messages ) {
     if( payload.empty() ) {
@@ -46,6 +50,5 @@ void message_handler( const kibitz::collaboration_messages_t& messages )  {
 
 
 void notification_handler( ) {
-  DLOG(INFO) << ">>>>>>>>>>>>>>> NOTIFY <<<<<<<<<<<<<<<<<<" ;
   kibitz::send_out_message( "initial message" );
 }

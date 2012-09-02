@@ -63,12 +63,12 @@ target_link_libraries( locator
 
 
 
-add_executable( test-worker-a  test_worker_a.cpp )
+add_executable( test-worker  test_worker.cpp )
 add_executable( unit-test unit_test.cpp )
 add_executable( worker-locator locator.cpp ) 
+add_executable( regression-tester regression_tester.cpp )
 
-
-target_link_libraries( test-worker-a kibitz )
+target_link_libraries( test-worker kibitz )
 target_link_libraries( unit-test kibitz )
 target_link_libraries( worker-locator locator )
-
+target_link_libraries( regression-tester kibitz )
