@@ -66,7 +66,7 @@ brew install yaml-cpp
 
 Management Scripts
 ------------------------
-Kibitz provides a handy control script to manage jobs.  You'll need to install ruby and RVM to use
+Kibitz provides a handy control script to manage jobs.  You'll need to install Ruby and RVM to use
 these scripts.  
 
 #### RVM
