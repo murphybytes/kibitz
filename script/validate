@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+
+infile = ARGV.shift
+
+inguids = IO.readlines( infile ).map { | guid | guid.chomp }
+
+
+ARGV.each do | outfile | 
+  outguid = IO.read( outfile )
+  exit 1 unless inguids.index( outguid ) 
+end
+
+
+exit 0

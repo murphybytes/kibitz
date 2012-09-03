@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+
+infile = ARGV.shift
+
+inguids = IO.readlines( infile ).map { | guid | guid.chomp }
+
+expected_count = ARGV.shift.to_i
+
+exit 1 unless expected_count == inguids.length
+exit 0
+
+

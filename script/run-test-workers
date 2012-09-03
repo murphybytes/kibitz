@@ -1,7 +1,0 @@
-!#/bin/bash
-
-./script/run-test-worker test_worker_a 1 9000 9100 ./config/test-worker-a.yaml &
-./script/run-test-worker test_worker_a 2 9001 9101 ./config/test-worker-a.yaml &
-./script/run-test-worker test_worker_b 1 9002 9102 ./config/test-worker-b.yaml &
-./script/run-test-worker test_worker_d 1 9003 9103 ./config/test-worker-d.yaml &
-./script/run-test-worker-init-node test_worker_c 1 9004 9104

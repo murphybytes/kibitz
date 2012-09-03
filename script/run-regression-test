@@ -1,6 +1,33 @@
 #!/bin/bash
 
+test_name=
+
+function test_passed
+{
+echo -e "\033[40m\033[1;32m ${test_name} ...Test Passed!  \033[0m"
+}
+
+function test_failed
+{
+echo -e "\033[40m\0331;31m ${test_name} ...Test Failed!   \033[0m"
+}
+
+
+function check_result
+{
+RESULT=$?
+echo
+if [[ $RESULT == "0" ]]
+then
+test_passed
+else
+test_failed
+fi
+}
+rm -fv test/*
+
 echo "Starting workers for traversal test"
+echo "A -> B,C -> D"
 
 
 KIBITZ_ROLE=ROOT GLOG_log_dir=log GLOG_minloglevel=0 ./src/regression-tester -I1 -Ttest_worker_a -b'tcp://localhost:5556' -d'tcp://localhost:5557' -p9000 -P9100 & 
@@ -8,12 +35,32 @@ KIBITZ_ROLE=CHILD GLOG_log_dir=log GLOG_minloglevel=0 ./src/regression-tester -I
 KIBITZ_ROLE=CHILD GLOG_log_dir=log GLOG_minloglevel=0 ./src/regression-tester -I1 -Ttest_worker_c -b'tcp://localhost:5556' -d'tcp://localhost:5557' -p9002 -P9102 -ftest/traversal/test-worker-c.yaml &
 KIBITZ_ROLE=CHILD GLOG_log_dir=log GLOG_minloglevel=0 ./src/regression-tester -I1 -Ttest_worker_d -b'tcp://localhost:5556' -d'tcp://localhost:5557' -p9003 -P9103 -ftest/traversal/test-worker-d.yaml &
 
-echo "wait 5 seconds for heartbeats to perculate throughout system"
-sleep 5 
+echo "wait for heartbeats to perculate throughout system"
+sleep 5
 echo "Workers started establishing collaboration connections and running jobs"
 KIBITZ_LOCATOR='tcp://localhost:5556' script/kibitz initiate --worker-type=test_worker_a --worker-id=1 
 sleep 5 
 KIBITZ_LOCATOR='tcp://localhost:5556' script/kibitz stop 
+
+test_name="Traversal A -> B"
+script/validate test/test_worker_b.1.in test/test_worker_a.1.out
+check_result
+
+test_name="Traversal A -> C"
+script/validate test/test_worker_c.1.in test/test_worker_a.1.out
+check_result
+
+test_name="Traversal B -> D"
+script/validate test/test_worker_d.1.in test/test_worker_b.1.out
+check_result
+
+test_name="Traversal C -> D"
+script/validate test/test_worker_d.1.in test/test_worker_c.1.out
+check_result
+
+test_name="D should have 2 messages"
+script/check_count test/test_worker_d.1.in 2
+check_result
 
 
 
