@@ -2,6 +2,13 @@
 #include <assert.h>
 #include <string.h>
 #include "kibitz_util.hpp"
+#include <boost/filesystem.hpp>
+#include <boost/format.hpp>
+#include <fstream>
+
+using boost::format;
+
+namespace fs = boost::filesystem;
 
 namespace kibitz {
   namespace util {
@@ -11,6 +18,25 @@ namespace kibitz {
 
     queue_interrupt::~queue_interrupt() throw() {
     }
+
+    void daemonize( const string& pid_file ) {
+      fs::path pid_path( pid_file );
+      if( fs::exists( pid_path ) ) {
+	throw std::runtime_error( (format("Lock file, %1% exists.") % pid_file ).str() );
+      }
+
+      int err = daemon( 0, 0 );
+      if( err ) {
+	throw std::runtime_error( (format( "Could not daemonize process. errno %1%" ) % errno ).str() );
+      }
+
+      std::fstream stm( pid_path.c_str(), std::ios::out | std::ios::trunc );
+      stm << getpid();
+      stm.close();
+
+
+    }
+
 
     void close_socket( void* socket ) {
       if( socket ) {

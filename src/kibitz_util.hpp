@@ -25,6 +25,7 @@ namespace kibitz {
     void check_zmq( int zmq_return_code ) ;
     void* create_socket( void* context, int socktype ) ;
     void close_socket( void* socket );
+    void daemonize( const string& pid_file ) ;
   }
 }
 

@@ -8,8 +8,9 @@
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
 #include <boost/format.hpp>
+#include <boost/filesystem.hpp>
 #include "registry.hpp"
-
+namespace fs = boost::filesystem;
 using boost::format;
 using namespace google;
 using std::string;
@@ -18,6 +19,8 @@ namespace po = boost::program_options;
 using kibitz::util::create_socket;
 using kibitz::util::check_zmq;
 using kibitz::util::close_socket;
+
+
 
 int main( int argc, char* argv[] ) {
 
@@ -31,6 +34,8 @@ int main( int argc, char* argv[] ) {
     ("heartbeat-binding,b", po::value<string>()->default_value("tcp://*:5556"), "Binding to listen for worker heartbeats" )
     ("port,p", po::value<int>()->default_value(5557), "Port used to distribute locator messages" )
     ("context-threads,t", po::value<int>()->default_value(1), "zmq context thread count")
+    ("daemon,d", "Run as a daemon" )
+    ( "pid-file", po::value<string>()->default_value( "/var/run/kibitz-locator.pid" ), "Location of pid file for daemon mode" )
     ;
 
   po::variables_map command_line;
@@ -75,6 +80,10 @@ int main( int argc, char* argv[] ) {
     registry reg(  inproc_pub_socket, inproc_sub_socket, outsocket );
     boost::thread sender_thread( reg );
 
+    if( command_line.count("daemon") ) {
+      kibitz::util::daemonize( command_line["pid-file"].as<string>() );
+    }
+
     try {
       while( true ) {
 	string message;
@@ -95,6 +104,7 @@ int main( int argc, char* argv[] ) {
     reg.push_message( inproc_notification_message );
     sender_thread.join();
 
+
   } catch( const std::exception& ex ) {
     exit_code = 1;
     LOG(ERROR) << "An exception killed worker locator " << ex.what() ;
@@ -106,7 +116,6 @@ int main( int argc, char* argv[] ) {
   close_socket( insocket ) ;
   zmq_term( context );
   
-
   
 
   return exit_code;

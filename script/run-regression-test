@@ -4,27 +4,44 @@ test_name=
 
 function test_passed
 {
-echo -e "\033[40m\033[1;32m ${test_name} ...Test Passed!  \033[0m"
+    echo -e "\033[40m\033[1;32m ${test_name} ...Test Passed!  \033[0m"
 }
 
 function test_failed
 {
-echo -e "\033[40m\0331;31m ${test_name} ...Test Failed!   \033[0m"
+    echo -e "\033[40m\033[1;31m ${test_name} ...Test Failed!   \033[0m"
 }
 
 
 function check_result
 {
-RESULT=$?
-echo
-if [[ $RESULT == "0" ]]
-then
-test_passed
-else
-test_failed
-fi
+    RESULT=$?
+    echo
+    if [[ $RESULT == "0" ]]
+    then
+	test_passed
+    else
+	test_failed
+    fi
 }
+
+function restart_locator
+{
+    echo "(re)starting locator"
+    if [ -e /var/run/kibitz-locator.pid ]
+    then
+	sudo kill -SIGINT `cat /var/run/kibitz-locator.pid`
+	sudo rm -f /var/run/kibitz-locator.pid
+    fi
+
+    sudo GLOG_log_dir=./log ./src/worker-locator -d 
+}
+
+
 rm -fv test/*
+
+#restart_locator
+
 
 echo "Starting workers for traversal test"
 echo "A -> B,C -> D"
