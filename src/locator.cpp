@@ -10,6 +10,7 @@
 #include <boost/format.hpp>
 #include <boost/filesystem.hpp>
 #include "registry.hpp"
+#include <signal.h>
 namespace fs = boost::filesystem;
 using boost::format;
 using namespace google;
@@ -20,13 +21,15 @@ using kibitz::util::create_socket;
 using kibitz::util::check_zmq;
 using kibitz::util::close_socket;
 
-
+string pid_file;
+void signal_callback( int sig ) {
+  fs::path path( pid_file );
+  if( fs::exists( path ) ) {
+    fs::remove_all( path );
+  }
+}
 
 int main( int argc, char* argv[] ) {
-
-  InitGoogleLogging( argv[0] );
-  InstallFailureSignalHandler( );
-  DLOG(INFO) << "Start locator" ;
 
   po::options_description options( "locator" );
   options.add_options()
@@ -41,6 +44,20 @@ int main( int argc, char* argv[] ) {
   po::variables_map command_line;
   po::store( po::parse_command_line( argc, argv, options ), command_line );
   po::notify( command_line );
+
+  if( command_line.count("daemon") ) {
+    pid_file = command_line["pid-file"].as<string>();
+    kibitz::util::daemonize( pid_file );
+    signal( SIGINT, signal_callback );
+    
+  }
+
+
+
+  InitGoogleLogging( argv[0] );
+  InstallFailureSignalHandler( );
+  DLOG(INFO) << "Start locator" ;
+
 
   const char* in_binding = command_line["heartbeat-binding"].as<string>().c_str() ;
   const int port = command_line["port"].as<int>() ;
@@ -80,10 +97,6 @@ int main( int argc, char* argv[] ) {
     registry reg(  inproc_pub_socket, inproc_sub_socket, outsocket );
     boost::thread sender_thread( reg );
 
-    if( command_line.count("daemon") ) {
-      kibitz::util::daemonize( command_line["pid-file"].as<string>() );
-    }
-
     try {
       while( true ) {
 	string message;
@@ -116,7 +129,7 @@ int main( int argc, char* argv[] ) {
   close_socket( insocket ) ;
   zmq_term( context );
   
-  
+
 
   return exit_code;
 

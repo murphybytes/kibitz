@@ -28,3 +28,7 @@ TAGS
 log/*
 src/core
 core
+src/regression-tester
+src/test-worker
+test/*.in
+test/*.out

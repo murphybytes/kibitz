@@ -28,19 +28,18 @@ function check_result
 function restart_locator
 {
     echo "(re)starting locator"
-    if [ -e /var/run/kibitz-locator.pid ]
+    if [ -e ${HOME}/kibitz-locator.pid ]
     then
-	sudo kill -SIGINT `cat /var/run/kibitz-locator.pid`
-	sudo rm -f /var/run/kibitz-locator.pid
+	kill -SIGINT `cat ${HOME}/kibitz-locator.pid`
     fi
 
-    sudo GLOG_log_dir=./log ./src/worker-locator -d 
+    GLOG_log_dir=./log ./src/worker-locator -d --pid-file=${HOME}/kibitz-locator.pid 
 }
 
 
 rm -fv test/*
 
-#restart_locator
+restart_locator
 
 
 echo "Starting workers for traversal test"
@@ -79,6 +78,9 @@ test_name="D should have 2 messages"
 script/check_count test/test_worker_d.1.in 2
 check_result
 
-
-
+echo "shutting down locator"
+if [ -e ${HOME}/kibitz-locator.pid ]
+then
+kill -SIGINT `cat ${HOME}/kibitz-locator.pid`
+fi
 
