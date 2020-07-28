@@ -4,7 +4,7 @@ GEM
     ffi (1.1.5)
     ffi-rzmq (0.9.6)
       ffi
-    json (1.7.5)
+    json (2.3.0)
     trollop (2.0)
 
 PLATFORMS
